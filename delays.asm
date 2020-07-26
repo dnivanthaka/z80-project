@@ -1,0 +1,52 @@
+	LIST P=18F452		;directive to define processor
+	#include <p18f452.inc>	;processor specific variable definitions
+UDATA
+	
+	DELAY1_TEMP RES 1
+	DELAY2_TEMP RES 1
+ 
+CODE	
+ 
+ delay_us:                           ; 40Mhz / 10 clock = 1us (1000ns) instruction cycle
+    movwf DELAY1_TEMP
+    
+dm_loop:
+    ;nop
+    ;nop
+    ;nop
+    ;nop
+    ;nop
+    ;nop
+    ;nop
+    ;nop
+    decfsz DELAY1_TEMP, f
+    goto dm_loop
+    
+    return
+    
+delay_millis:
+    ; delay upto 255 milliseconds
+    movwf DELAY2_TEMP
+    
+dmi_loop:
+    movlw .100
+    call delay_us
+    movlw .100
+    call delay_us
+    movlw .100
+    call delay_us
+    movlw .100
+    call delay_us
+    
+    decfsz DELAY2_TEMP
+    goto dmi_loop
+    
+    return
+;------------------------------------------------------------------------
+GLOBAL delay_us
+GLOBAL delay_millis
+   
+END
+    
+
+
