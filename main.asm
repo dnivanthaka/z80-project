@@ -15,6 +15,7 @@
 
 	LIST P=18F452		;directive to define processor
 	#include <p18f452.inc>	;processor specific variable definitions
+	#include "mcp23s17.inc"
 	
 
 ;******************************************************************************
@@ -75,46 +76,6 @@ CONFIG EBTR3 = OFF      ; Table Read Protection bit (Block 3 (006000-007FFFh) no
 ;CONFIG = PLLDIV_10_1L ; For 40Mhz input = 40 / 10 = 4
 ;CONFIG = _CPUDIV_OSC1_PLL2_1L ; 96Mhz / 2
  ;   CONFIG	FOSC = XT_XT         ;XT oscillator, XT used by USB
- 
-#define IODIRA     0x00
-#define IODIRB_0   0x01
-#define IODIRB_1   0x10
-#define IPOLA_0    0x02
-#define IPOLA_1    0x01
-#define GPINTENA_0 0x04
-#define GPINTENA_1 0x02
-#define GPINTENB_0 0x05
-#define GPINTENB_1 0x12
-#define DEFVALA_0  0x06
-#define DEFVALA_1  0x03
-#define DEFVALB_0  0x07
-#define DEFVALB_1  0x13
-#define INTCONA_0  0x08
-#define INTCONA_1  0x04
-#define INTCONB_0  0x09
-#define INTCONB_1  0x14
-#define IOCON_0    0x0A
-#define IOCON_1    0x05
-#define GPPUA_0    0x0C
-#define GPPUA_1    0x06
-#define GPPUB_0    0x0D
-#define GPPUB_1    0x16
-#define INTFA_0    0x0E
-#define INTFA_1    0x07
-#define INTFB_0    0x0F    
-#define INTFB_1    0x17
-#define INTCAPA_0  0x10
-#define INTCAPA_1  0x08
-#define INTCAPB_0  0x11
-#define INTCAPB_1  0x18
-#define GPIOA_0    0x12
-#define GPIOA_1    0x09
-#define GPIOB_0    0x13
-#define GPIOB_1    0x19
-#define OLATA_0    0x14
-#define OLATA_1    0x0A
-#define OLATB_0    0x15
-#define OLATB_1    0x1A 
  
 #define		SERIAL_2_PORT		PORTA	
 #define		SERIAL_2_TRIS		TRISA
@@ -182,10 +143,30 @@ EXTERN databusmode_set
 EXTERN databus_write
 EXTERN databus_read
 
+EXTERN addressbus_val	    
 EXTERN addressbus_init
 EXTERN addressbusmode_set
 EXTERN addressbus_read
-EXTERN addressbus_write	    
+EXTERN addressbus_write
+	    
+SRAM_WRITE MACRO ADDR, VAL
+	    movlw ADDR & 0xff
+	    movwf addressbus_val
+	    movlw (ADDR >> 8) & 0xff
+	    movwf addressbus_val+1
+
+	    movlw VAL
+	    call sram_write
+	   ENDM
+	   
+SRAM_READ MACRO ADDR
+	    movlw ADDR & 0xff
+	    movwf addressbus_val
+	    movlw (ADDR >> 8) & 0xff
+	    movwf addressbus_val+1
+
+	    call sram_read
+	   ENDM
 	    
 ;******************************************************************************
 ;Variable definitions
@@ -193,28 +174,21 @@ EXTERN addressbus_write
 ; More variables may be needed to store other special function registers used
 ; in the interrupt routines.
 
-		CBLOCK	0x080
+		CBLOCK	;0x080
 		WREG_TEMP	;variable used for context saving 
 		STATUS_TEMP	;variable used for context saving
 		BSR_TEMP	;variable used for context saving
 		
-		URXDATA
-		UTXDATA
-		
 		temp
-		db_temp
 		sram_temp
 		tdata
 		counter
-		bitcounter
 		ENDC
 
 		CBLOCK	0x000
-		EXAMPLE		;example of a variable in access RAM
+		;EXAMPLE		;example of a variable in access RAM
 		ENDC
 		
-		UDATA
-		addressbus_val RES 2
 
 ;******************************************************************************
 ;EEPROM data
@@ -320,15 +294,17 @@ Main:
 ;    clrf addressbus_val
 ;    clrf addressbus_val+1
     
-    movlw 0x0f
-    movwf addressbus_val
-    movwf addressbus_val+1
+;    movlw 0x0f
+;    movwf addressbus_val
+;    movwf addressbus_val+1
     
 ;    movlw 0x00
 ;    movwf addressbus_val
     
-    movlw 0x55
-    call sram_write
+;    movlw 0x55
+;    call sram_write
+    
+    SRAM_WRITE 0x1fac, 0x5d
     
         
 ;    movlw IODIRA
@@ -383,26 +359,11 @@ main_loop:
 ;    call delay_millis
     
     ;---------------------------------------------------------------------------
-    clrf addressbus_val
-    clrf addressbus_val+1
-    
-;    movlw 0x00
-;    call addressbusmode_set
-;    
-    movlw 0x0f
-    movwf addressbus_val
-    movwf addressbus_val+1
-;    
-;    call addressbus_write
-    
-;        movlw 0x01
-;    call databusmode_set
-    
-    call sram_read
+    SRAM_READ 0x1fac
     ;movwf temp
-    xorlw 0x55
-    btfss STATUS, Z
-    bra main_loop
+    xorlw 0x5d
+    ;btfss STATUS, Z
+    bnz main_loop
 ;    movlw 0x14
 ;    movwf MCP23X17_REG
 ;    
@@ -622,191 +583,6 @@ sw_serial_done
 ;	call    delay_us
 
 	return
-;----------------------------------------------------------------
-;addressbus_init:
-;    movlw 0x01
-;    call addressbusmode_set
-;    
-;    return
-;----------------------------------------------------------------
-    
-;databus_init:
-;    ;Settingup pins as input
-;    movlw 0x01
-;    call databusmode_set
-;    
-;    return
-;----------------------------------------------------------------    
-;databusmode_set:
-;    bcf STATUS, Z
-;    xorlw 0x01
-;    btfss STATUS, Z
-;    bra _db_mode_output
-;    
-;_db_mode_input:
-;    bsf TRISC, RC0
-;    bsf TRISC, RC1
-;    bsf TRISC, RC2
-;    ;bsf TRISC, RC3
-;    bsf TRISD, RD0
-;    bsf TRISD, RD1
-;    bsf TRISD, RD2
-;    bsf TRISD, RD3
-;    bsf TRISD, RD4
-;    return
-;_db_mode_output:
-;    bcf TRISC, RC0
-;    bcf TRISC, RC1
-;    bcf TRISC, RC2
-;    ;bcf TRISC, RC3
-;    bcf TRISD, RD0
-;    bcf TRISD, RD1
-;    bcf TRISD, RD2
-;    bcf TRISD, RD3
-;    bcf TRISD, RD4
-;    
-;    return
-;----------------------------------------------------------------
-;addressbusmode_set:
-;    bcf STATUS, Z
-;    xorlw 0x01
-;    btfss STATUS, Z
-;    bra _ab_mode_output
-;    
-;_ab_mode_input:
-;    movlw IODIRA
-;    movwf MCP23X17_REG
-;    
-;    movlw 0xff
-;    movwf MCP23X17_DATA
-;    
-;    call mcp23s17_write
-;    
-;    movlw IODIRB_0
-;    movwf MCP23X17_REG
-;    
-;    movlw 0xff
-;    movwf MCP23X17_DATA
-;    
-;    call mcp23s17_write
-;    return
-;_ab_mode_output:    
-;    movlw IODIRA
-;    movwf MCP23X17_REG
-;    
-;    movlw 0x00
-;    movwf MCP23X17_DATA
-;    
-;    call mcp23s17_write
-;    
-;    movlw IODIRB_0
-;    movwf MCP23X17_REG
-;    
-;    movlw 0x00
-;    movwf MCP23X17_DATA
-;    
-;    call mcp23s17_write
-;    
-;    return
-;----------------------------------------------------------------
-    
-;databus_read:
-;    clrf db_temp
-;    
-;    btfsc PORTC, RC0
-;    bsf db_temp, 0
-;    btfsc PORTC, RC1
-;    bsf db_temp, 1
-;    btfsc PORTC, RC2
-;    bsf db_temp, 2
-;    btfsc PORTD, RD0
-;    bsf db_temp, 3
-;    btfsc PORTD, RD1
-;    bsf db_temp, 4
-;    btfsc PORTD, RD2
-;    bsf db_temp, 5
-;    btfsc PORTD, RD3
-;    bsf db_temp, 6
-;    btfsc PORTD, RD4
-;    bsf db_temp, 7
-;    
-;    movf db_temp, w
-;    
-;    return
-;    
-;databus_write:
-;    movwf db_temp
-;    
-;    bcf LATC, LATC0
-;    bcf LATC, LATC1
-;    bcf LATC, LATC2
-;    bcf LATD, LATD0
-;    bcf LATD, LATD1
-;    bcf LATD, LATD2
-;    bcf LATD, LATD3
-;    bcf LATD, LATD4
-;    
-;    btfsc db_temp, 0
-;    bsf LATC, LATC0
-;    btfsc db_temp, 1
-;    bsf LATC, LATC1
-;    btfsc db_temp, 2
-;    bsf LATC, LATC2
-;    btfsc db_temp, 3
-;    bsf LATD, LATD0
-;    btfsc db_temp, 4
-;    bsf LATD, LATD1
-;    btfsc db_temp, 5
-;    bsf LATD, LATD2
-;    btfsc db_temp, 6
-;    bsf LATD, LATD3
-;    btfsc db_temp, 7
-;    bsf LATD, LATD4
-;    
-;    return
-;----------------------------------------------------------------    
-;addressbus_read:
-;    clrf addressbus_val
-;    clrf addressbus_val+1
-;    
-;    ;low 8 bits
-;    movlw GPIOA_0
-;    movwf MCP23X17_REG
-;    
-;    call mcp23s17_read
-;    
-;    movwf addressbus_val
-;    
-;    ;high 8 bits
-;    movlw GPIOB_0
-;    movwf MCP23X17_REG
-;    
-;    call mcp23s17_read
-;    
-;    movwf addressbus_val+1
-;    
-;    return
-;----------------------------------------------------------------    
-;addressbus_write:
-;    ;low 8 bits
-;    movlw GPIOA_0
-;    movwf MCP23X17_REG
-;    
-;    movf addressbus_val, w
-;    movwf MCP23X17_DATA
-;    
-;    call mcp23s17_write
-;    
-;    ;high 8 bits
-;    movlw GPIOB_0
-;    movwf MCP23X17_REG
-;    
-;    movf addressbus_val+1, w
-;    movwf MCP23X17_DATA
-;    
-;    call mcp23s17_write
-;    
-;    return
 ;----------------------------------------------------------------    
 sram_read:
     clrf sram_temp

@@ -18,8 +18,8 @@ databus_init:
 databusmode_set:
     bcf STATUS, Z
     xorlw 0x01
-    btfss STATUS, Z
-    bra _db_mode_output
+    ;btfss STATUS, Z
+    bnz _db_mode_output
     
 _db_mode_input:
     bsf TRISC, RC0
