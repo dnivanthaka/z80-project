@@ -76,11 +76,7 @@ CONFIG EBTR3 = OFF      ; Table Read Protection bit (Block 3 (006000-007FFFh) no
 ;CONFIG = PLLDIV_10_1L ; For 40Mhz input = 40 / 10 = 4
 ;CONFIG = _CPUDIV_OSC1_PLL2_1L ; 96Mhz / 2
  ;   CONFIG	FOSC = XT_XT         ;XT oscillator, XT used by USB
- 
-#define		SERIAL_2_PORT		PORTA	
-#define		SERIAL_2_TRIS		TRISA
-#define         SERIAL_2_PIN           3
- 
+  
 #define         SRAM_CS2_PIN           1
 #define         SRAM_CS2_LAT           LATA
 #define         SRAM_CS2_TRIS          TRISA
@@ -117,14 +113,6 @@ SRAM_WE_HI MACRO
 SRAM_WE_LO MACRO
 	    bcf     SRAM_WE_LAT, SRAM_WE_PIN
 	    ENDM 
-	    
-SERIAL_2_HI MACRO
-	    bsf     SERIAL_2_PORT, SERIAL_2_PIN
-	    ENDM
-		    
-SERIAL_2_LO MACRO
-	    bcf     SERIAL_2_PORT, SERIAL_2_PIN
-	    ENDM 
  
 EXTERN ssp_init
 EXTERN ssp_read
@@ -148,6 +136,13 @@ EXTERN addressbus_init
 EXTERN addressbusmode_set
 EXTERN addressbus_read
 EXTERN addressbus_write
+	    
+EXTERN usart_init
+EXTERN usart_putchar
+EXTERN usart_getchar
+EXTERN usart_newline
+EXTERN usart_getmessages
+EXTERN usart_hex2ascii
 	    
 SRAM_WRITE MACRO ADDR, VAL
 	    movlw ADDR & 0xff
@@ -181,8 +176,7 @@ SRAM_READ MACRO ADDR
 		
 		temp
 		sram_temp
-		tdata
-		counter
+		
 		ENDC
 
 		CBLOCK	0x000
@@ -266,78 +260,20 @@ Main:
     bsf LATA, 0
     bcf TRISA, 0
     
-    ;sram pins
-    
-    bcf LATA, 1
-    bcf TRISA, 1
-    
-    bcf LATA, 2
-    bcf TRISA, 2
-    
-    bcf LATA, 3
-    bcf TRISA, 3
     
     ;call 
     
     call databus_init
     call addressbus_init
     
-    call sram_deselect
+    ;call sram_deselect
+    call sram_init
     
-    ;call mcp23s17_init
-;    movlw 0x00
-;    movwf MCP23X17_REG
-;    
-;    call mcp23s17_read
-;    movwf temp
-    
-;    clrf addressbus_val
-;    clrf addressbus_val+1
-    
-;    movlw 0x0f
-;    movwf addressbus_val
-;    movwf addressbus_val+1
-    
-;    movlw 0x00
-;    movwf addressbus_val
-    
-;    movlw 0x55
-;    call sram_write
-    
-    SRAM_WRITE 0x1fac, 0x5d
-    
-        
-;    movlw IODIRA
-;    movwf MCP23X17_REG
-;    
-;    movlw 0x00
-;    movwf MCP23X17_DATA
-;    
-;    call mcp23s17_write
+    SRAM_WRITE 0x0001, 0x5a
+    SRAM_WRITE 0x0002, 0x6b
+    SRAM_WRITE 0xffff, 0x7c
     
 main_loop:
-;    bcf STATUS, Z
-;    movlw 0xff
-;    subwf temp, w
-;    btfss STATUS, Z
-;    bra main_loop
-    
-;    movlw 0x14
-;    movwf MCP23X17_REG
-;    
-;    movlw 0xff
-;    movwf MCP23X17_DATA
-;    
-;    call mcp23s17_write
-    
-;    movlw GPIOA_0
-;    movwf MCP23X17_REG
-;    
-;    movlw 0x80
-;    movwf MCP23X17_DATA
-;    
-;    call mcp23s17_write
-    ;movwf temp
     
     ;xorlw 0x80
 ;    btfss temp, 7
@@ -347,8 +283,8 @@ main_loop:
     ;bsf LATA, 1
     ;SRAM_CS2_HI
     
-;    movlw 'X'
-;    call usart_putchar
+    movlw 'X'
+    call usart_putchar
     
 ;    movlw 0x00
 ;    call addressbusmode_set
@@ -359,18 +295,11 @@ main_loop:
 ;    call delay_millis
     
     ;---------------------------------------------------------------------------
-    SRAM_READ 0x1fac
+    SRAM_READ 0xffff
     ;movwf temp
-    xorlw 0x5d
+    xorlw 0x7c
     ;btfss STATUS, Z
     bnz main_loop
-;    movlw 0x14
-;    movwf MCP23X17_REG
-;    
-;    movlw 0xff
-;    movwf MCP23X17_DATA
-;;    
-;    call mcp23s17_write
     
     bcf LATA, 0
     ;bcf LATA, 1
@@ -398,191 +327,7 @@ mcu_init:
     clrf CCP1CON
     clrf CCP2CON                ; disable comparator
     
-    SERIAL_2_HI
-    
-    bcf     SERIAL_2_TRIS, SERIAL_2_PIN
-    
     return
-;-------------------------------------------------------------    
-usart_init:
-    bcf TRISC, TRISC6            ; tx pin
-    ;bsf TRISC, TRISC7            ; rx pin
-    
-    clrf TXREG
-    clrf RCREG
-    ;bsf PIR1, TXIF
-    
-    movlw 0x40                   ; 19200
-    ;movlw 0x1F                    ; 19200 @ 40Mhz
-    movwf SPBRG
-    
-    movlw 0x24
-    movwf TXSTA
-    
-    bcf TXSTA, SYNC
-    bsf RCSTA, SPEN
-    
-    
-    ;bsf PIE1, TXIE
-    ;bsf PIE1, RCIE
-    
-    return
-;--------------------------------------------------------------------    
-usart_putchar:
-    ;movwf UTXDATA
-    ;INTCON, GIE
-    
-    btfss PIR1, TXIF
-    bra usart_putchar
-    
-    movwf TXREG
-    return
-;--------------------------------------------------------------------    
-usart_getchar:
-    btfss PIR1, RCIF
-    bra usart_getchar
-    
-    movf RCREG, w
-    return
-    
-;--------------------------------------------------------------------
-;usart_putstr:
-;    movwf	FSR
-;    
-;outmessage:
-;    movf FSR, w
-;    incf FSR, f
-;    call getmessages
-;    xorlw 0
-;    btfsc STATUS, Z
-;    return
-;    call TXPoll
-;    goto outmessage
-;    return
-;--------------------------------------------------------------------    
-usart_newline:
-    movlw 0x0D
-    call usart_putchar
-    movlw 0x0A
-    call usart_putchar
-    return
-;--------------------------------------------------------------------
-usart_getmessages:
-	addwf	PCL, f
-	;dt	"Test Message", 0
-	;dt	"Test Message2", 0
-	dt "-------------------------------------------", 0x0D, 0x0A
-	dt "Test Message", 0x0D, 0x0A
-	dt "-------------------------------------------", 0
-;--------------------------------------------------------------------
-usart_hex2ascii:
-	movwf	temp
-	btfss	temp, 3
-	goto	ztn
-	xorlw	0x08
-	btfsc	STATUS, Z
-	goto	ztn
-	nop
-	movf	temp, w
-	xorlw	0x09
-	btfsc	STATUS, Z
-	goto	ztn
-	nop
-	movlw	0x07
-	addwf	temp, f
-ztn:
-	movf	temp, w
-	addlw	0x30
-	call	usart_putchar
-	return
-;----------------------------------------------------------------------
-;Software serial TX, 8N1 format
-TXPoll_sw:                           ;1200bps
-        movwf   tdata
-	movlw   .8                 ;8N1
-	movwf   counter
-	
-	SERIAL_2_LO                ;start bit
-	
-	movlw   .55
-	call    delay_us
-	
-	;movlw   .250
-	;pagesel delay_us
-	;call    delay_us
-	
-	;movlw   .250
-	;pagesel delay_us
-	;call    delay_us
-	
-	;movlw   .250
-	;pagesel delay_us
-	;call    delay_us
-	
-;	movlw   .104
-;	pagesel delay_us
-;	call    delay_us
-	
-sw_serial_loop
-	
-	rrncf tdata, f
-	btfss STATUS, C
-	goto  sw_serial_zero
-	goto  sw_serial_one
-	
-sw_serial_zero
-	SERIAL_2_LO
-	goto sw_serial_done
-	
-sw_serial_one
-	SERIAL_2_HI
-
-sw_serial_done	
-	movlw   .55
-	call    delay_us
-	
-	;movlw   .250
-	;pagesel delay_us
-	;call    delay_us
-	
-	;movlw   .250
-	;pagesel delay_us
-	;call    delay_us
-	
-	;movlw   .250
-	;pagesel delay_us
-	;call    delay_us
-	
-;	movlw   .104
-;	pagesel delay_us
-;	call    delay_us
-	
-	decfsz counter, f
-	goto sw_serial_loop
-	
-	;stop bit
-	SERIAL_2_HI
-	
-	movlw   .55
-	call    delay_us
-	
-	;movlw   .250
-	;pagesel delay_us
-	;call    delay_us
-	
-	;movlw   .250
-	;pagesel delay_us
-	;call    delay_us
-	
-	;movlw   .250
-	;pagesel delay_us
-	;call    delay_us
-	
-;	movlw   .104
-;	pagesel delay_us
-;	call    delay_us
-
-	return
 ;----------------------------------------------------------------    
 sram_read:
     clrf sram_temp
@@ -657,6 +402,22 @@ sram_deselect:
     SRAM_CS2_LO
     SRAM_WE_HI
     ;SRAM_CS2_LO
+    
+    return
+;----------------------------------------------------------------
+sram_init:
+    ;sram pins
+    
+    bcf LATA, 1
+    bcf TRISA, 1
+    
+    bcf LATA, 2
+    bcf TRISA, 2
+    
+    bcf LATA, 3
+    bcf TRISA, 3
+    
+    call sram_deselect
     
     return
 ;----------------------------------------------------------------
