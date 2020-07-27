@@ -77,9 +77,9 @@ CONFIG EBTR3 = OFF      ; Table Read Protection bit (Block 3 (006000-007FFFh) no
 ;CONFIG = _CPUDIV_OSC1_PLL2_1L ; 96Mhz / 2
  ;   CONFIG	FOSC = XT_XT         ;XT oscillator, XT used by USB
   
-#define         SRAM_CS2_PIN           1
-#define         SRAM_CS2_LAT           LATA
-#define         SRAM_CS2_TRIS          TRISA
+#define         SRAM_CS1_PIN           1
+#define         SRAM_CS1_LAT           LATA
+#define         SRAM_CS1_TRIS          TRISA
  
 #define         SRAM_OE_PIN           2
 #define         SRAM_OE_LAT           LATA
@@ -88,14 +88,17 @@ CONFIG EBTR3 = OFF      ; Table Read Protection bit (Block 3 (006000-007FFFh) no
 #define         SRAM_WE_PIN           3
 #define         SRAM_WE_LAT           LATA
 #define         SRAM_WE_TRIS          TRISA 
+
+#define		Z80_RESET_PIN         7
+#define		Z80_RESET_LAT         LATD
+#define		Z80_RESET_TRIS        TRISD
  
- 
-SRAM_CS2_HI MACRO
-	    bsf     SRAM_CS2_LAT, SRAM_CS2_PIN
+SRAM_CS1_HI MACRO
+	    bsf     SRAM_CS1_LAT, SRAM_CS1_PIN
 	    ENDM 
  
-SRAM_CS2_LO MACRO
-	    bcf     SRAM_CS2_LAT, SRAM_CS2_PIN
+SRAM_CS1_LO MACRO
+	    bcf     SRAM_CS1_LAT, SRAM_CS1_PIN
 	    ENDM 
 
 SRAM_OE_HI MACRO
@@ -246,6 +249,10 @@ HighInt:
 
 Main:
     call mcu_init
+    
+    bcf Z80_RESET_LAT, Z80_RESET_PIN
+    bcf Z80_RESET_TRIS, Z80_RESET_PIN
+    
     call usart_init
     
     call ssp_init
@@ -269,10 +276,15 @@ Main:
     ;call sram_deselect
     call sram_init
     
-    SRAM_WRITE 0x0001, 0x5a
-    SRAM_WRITE 0x0002, 0x6b
-    SRAM_WRITE 0xffff, 0x7c
+    SRAM_WRITE 0x0000, 0x00
+    SRAM_WRITE 0x0001, 0x00
+    SRAM_WRITE 0x0002, 0x00
+    SRAM_WRITE 0x0003, 0x00
+    SRAM_WRITE 0x0004, 0x00
+    SRAM_WRITE 0x0005, 0x76
     
+    call z80_reset
+    call release_control
 main_loop:
     
     ;xorlw 0x80
@@ -295,11 +307,11 @@ main_loop:
 ;    call delay_millis
     
     ;---------------------------------------------------------------------------
-    SRAM_READ 0xffff
+    ;SRAM_READ 0x0005
     ;movwf temp
-    xorlw 0x7c
+    ;xorlw 0x76
     ;btfss STATUS, Z
-    bnz main_loop
+    ;bnz main_loop
     
     bcf LATA, 0
     ;bcf LATA, 1
@@ -344,7 +356,7 @@ sram_read:
     call databusmode_set
     
     SRAM_OE_HI
-    SRAM_CS2_HI
+    SRAM_CS1_LO
     SRAM_OE_LO
     
     ;nop
@@ -352,7 +364,7 @@ sram_read:
     movwf sram_temp
     
     SRAM_OE_HI
-    SRAM_CS2_LO
+    SRAM_CS1_HI
     
 ;    movlw 0x00
 ;    call databusmode_set
@@ -377,7 +389,7 @@ sram_write:
     call databus_write
     
     SRAM_OE_HI
-    SRAM_CS2_HI
+    SRAM_CS1_LO
     SRAM_WE_LO
     
     ;nop
@@ -386,7 +398,7 @@ sram_write:
     call delay_millis
     
     SRAM_WE_HI
-    SRAM_CS2_LO
+    SRAM_CS1_HI
     
     clrf addressbus_val
     clrf addressbus_val+1
@@ -399,7 +411,7 @@ sram_write:
 ;----------------------------------------------------------------
 sram_deselect:
     SRAM_OE_HI
-    SRAM_CS2_LO
+    SRAM_CS1_HI
     SRAM_WE_HI
     ;SRAM_CS2_LO
     
@@ -421,6 +433,31 @@ sram_init:
     
     return
 ;----------------------------------------------------------------
+release_control:
+    ; sram control lines
+    bsf TRISA, 1
+    bsf TRISA, 2
+    bsf TRISA, 3
+    
+    movlw 0x01
+    call addressbusmode_set
+    
+    movlw 0x01
+    call databusmode_set
+    return
+;----------------------------------------------------------------
+z80_reset:
+    bcf Z80_RESET_LAT, Z80_RESET_PIN
+    bcf Z80_RESET_TRIS, Z80_RESET_PIN
+    
+    movlw .255
+    call delay_millis
+    movlw .255
+    call delay_millis
+    
+    bsf Z80_RESET_TRIS, Z80_RESET_PIN
+    
+    return
     END
 
 

@@ -11,7 +11,7 @@ CODE
     movwf DELAY1_TEMP
     
 dm_loop:
-    ;nop
+    nop
     ;nop
     ;nop
     ;nop
@@ -20,7 +20,7 @@ dm_loop:
     ;nop
     ;nop
     decfsz DELAY1_TEMP, f
-    goto dm_loop
+    bra dm_loop
     
     return
     
