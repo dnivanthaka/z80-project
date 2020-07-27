@@ -177,6 +177,11 @@ SRAM_READ MACRO ADDR
 		STATUS_TEMP	;variable used for context saving
 		BSR_TEMP	;variable used for context saving
 		
+		;variables used in interrupts
+		int_temp
+		int_temp2
+		int_temp3
+		
 		temp
 		sram_temp
 		
@@ -237,10 +242,42 @@ SRAM_READ MACRO ADDR
 ; the low priority interrupt vector.
 
 HighInt:
-
-;	*** high priority interrupt code goes here ***
-
-
+		movff	STATUS,STATUS_TEMP	;save STATUS register
+		movff	WREG,WREG_TEMP		;save working register
+		movff	BSR,BSR_TEMP		;save BSR register
+		
+		;	*** high priority interrupt code goes here ***
+		;Check ext INT0
+		btfsc INTCON, INT0IF
+		bra int0_handle
+		bra int_exit
+		
+int0_handle:
+		bsf LATD, 6
+		
+		;Read addressbus
+		call addressbus_read
+		movf addressbus_val, w
+		xorlw 0x05
+		bz int_latch_op
+		bra int0_exit
+int_latch_op:
+		call databus_read
+		xorlw 0x00
+		bz int_latch_reset
+		bra int_latch_set
+int_latch_reset:
+		bcf LATD, 6
+		bra int0_exit
+int_latch_set:
+		bsf LATD, 6
+int0_exit:    
+		bcf INTCON, INT0IF
+int_exit:
+    
+		movff	BSR_TEMP,BSR		;restore BSR register
+		movff	WREG_TEMP,WREG		;restore working register
+		movff	STATUS_TEMP,STATUS	;restore STATUS register
 		retfie	FAST
 
 ;******************************************************************************
@@ -267,6 +304,13 @@ Main:
     bsf LATA, 0
     bcf TRISA, 0
     
+    ;io req pins
+    ;int
+    bcf TRISD, 6
+    bcf LATD, 6
+    ;wr
+    bsf TRISD, 5
+    
     
     ;call 
     
@@ -276,15 +320,39 @@ Main:
     ;call sram_deselect
     call sram_init
     
-    SRAM_WRITE 0x0000, 0x00
-    SRAM_WRITE 0x0001, 0x00
-    SRAM_WRITE 0x0002, 0x00
-    SRAM_WRITE 0x0003, 0x00
-    SRAM_WRITE 0x0004, 0x00
-    SRAM_WRITE 0x0005, 0x76
+;    SRAM_WRITE 0x0000, 0x00
+;    SRAM_WRITE 0x0001, 0x00
+;    SRAM_WRITE 0x0002, 0x00
+;    SRAM_WRITE 0x0003, 0xc3
+;    SRAM_WRITE 0x0004, 0x00
+;    SRAM_WRITE 0x0005, 0x00
+;    SRAM_WRITE 0x0006, 0x76
+;    SRAM_WRITE 0x0007, 0x00
     
+    SRAM_WRITE 0x0000, 0x3e
+    SRAM_WRITE 0x0001, 0x01
+    SRAM_WRITE 0x0002, 0xd3
+    SRAM_WRITE 0x0003, 0x05
+    SRAM_WRITE 0x0004, 0xc3
+    SRAM_WRITE 0x0005, 0x00
+    SRAM_WRITE 0x0006, 0x00
+    SRAM_WRITE 0x0007, 0x76
+    
+;    SRAM_WRITE 0x0000, 0x01
+;    SRAM_WRITE 0x0001, 0x3e
+;;    SRAM_WRITE 0x0002, 0x05
+;;    SRAM_WRITE 0x0003, 0xd3
+;    SRAM_WRITE 0x0002, 0x00
+;    SRAM_WRITE 0x0003, 0x00
+;    SRAM_WRITE 0x0004, 0xc3
+;    SRAM_WRITE 0x0005, 0x00
+;    SRAM_WRITE 0x0006, 0x76
+    
+     
     call z80_reset
     call release_control
+    call become_iomode
+    ;call z80_reset
 main_loop:
     
     ;xorlw 0x80
@@ -307,11 +375,11 @@ main_loop:
 ;    call delay_millis
     
     ;---------------------------------------------------------------------------
-    ;SRAM_READ 0x0005
-    ;movwf temp
-    ;xorlw 0x76
-    ;btfss STATUS, Z
-    ;bnz main_loop
+;    SRAM_READ 0x0002
+;    ;movwf temp
+;    xorlw 0xd3
+;    btfss STATUS, Z
+;    goto main_loop
     
     bcf LATA, 0
     ;bcf LATA, 1
@@ -359,7 +427,7 @@ sram_read:
     SRAM_CS1_LO
     SRAM_OE_LO
     
-    ;nop
+    nop
     call databus_read
     movwf sram_temp
     
@@ -392,10 +460,10 @@ sram_write:
     SRAM_CS1_LO
     SRAM_WE_LO
     
-    ;nop
-    ;nop
-    movlw .100
-    call delay_millis
+    nop
+    nop
+    nop
+    nop
     
     SRAM_WE_HI
     SRAM_CS1_HI
@@ -454,8 +522,25 @@ z80_reset:
     call delay_millis
     movlw .255
     call delay_millis
+    movlw .255
+    call delay_millis
     
     bsf Z80_RESET_TRIS, Z80_RESET_PIN
+    
+    return
+    
+become_iomode:
+    ; enable ioreq interrupts, falling edge
+    bcf INTCON2, INTEDG0
+    bcf INTCON, INT0IF
+    bsf INTCON, INT0IE
+    
+    ;disable priority interrupts
+    bcf RCON, IPEN
+    
+    bsf INTCON, 6 ; PEIE
+    bsf INTCON, 7 ; GIE
+    
     
     return
     END
