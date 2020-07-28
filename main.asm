@@ -324,12 +324,6 @@ Main:
     bsf LATA, 0
     bcf TRISA, 0
     
-    ;io req pins
-    ;int
-    ;bcf TRISD, 6
-    ;bcf LATD, 6
-    ;wr
-    ;bsf TRISD, 5
     bcf LATB, 3
     bcf TRISB, 3
     
@@ -338,15 +332,6 @@ Main:
     
     ;call sram_deselect
     call sram_init
-    
-;    SRAM_WRITE 0x0000, 0x00
-;    SRAM_WRITE 0x0001, 0x00
-;    SRAM_WRITE 0x0002, 0x00
-;    SRAM_WRITE 0x0003, 0xc3
-;    SRAM_WRITE 0x0004, 0x00
-;    SRAM_WRITE 0x0005, 0x00
-;    SRAM_WRITE 0x0006, 0x76
-;    SRAM_WRITE 0x0007, 0x00
     
     SRAM_WRITE 0x0000, 0x3e
     SRAM_WRITE 0x0001, 0x87
@@ -359,28 +344,12 @@ Main:
     SRAM_WRITE 0x0008, 0x00
     SRAM_WRITE 0x0009, 0x00
     
-    ;nop
-    ;nop
-    
-;    SRAM_WRITE 0x0000, 0x01
-;    SRAM_WRITE 0x0001, 0x3e
-;;    SRAM_WRITE 0x0002, 0x05
-;;    SRAM_WRITE 0x0003, 0xd3
-;    SRAM_WRITE 0x0002, 0x00
-;    SRAM_WRITE 0x0003, 0x00
-;    SRAM_WRITE 0x0004, 0xc3
-;    SRAM_WRITE 0x0005, 0x00
-;    SRAM_WRITE 0x0006, 0x76
-    
     
     call release_control
  
     call z80_reset
     call become_iomode
-    ;call z80_reset
     
-    
-    ;call z80_reset
 main_loop:
     
     ;xorlw 0x80
@@ -536,6 +505,9 @@ release_control:
     
     movlw 0x01
     call databusmode_set
+    
+    call sram_deselect
+    
     return
 ;----------------------------------------------------------------
 z80_reset:
