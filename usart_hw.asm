@@ -1,8 +1,10 @@
 	LIST P=18F452		;directive to define processor
-	#include <p18f452.inc>	;processor specific variable definitions
+	#include <p18f452.inc>	;processor specific variable definitions	
+	
     UDATA
 	
 	temp RES 1
+	temp2 RES 1
  
     CODE
 usart_init:
@@ -13,7 +15,8 @@ usart_init:
     clrf RCREG
     ;bsf PIR1, TXIF
     
-    movlw 0x40                   ; 19200
+    movlw 0x6A
+    ;movlw 0x40                   ; 19200
     ;movlw 0x1F                    ; 19200 @ 40Mhz
     movwf SPBRG
     
@@ -76,7 +79,7 @@ usart_getmessages:
 	dt "Test Message", 0x0D, 0x0A
 	dt "-------------------------------------------", 0
 ;--------------------------------------------------------------------
-usart_hex2ascii:
+usart_hex2ascii_nb:
 	movwf	temp
 	btfss	temp, 3
 	goto	ztn
@@ -96,6 +99,18 @@ ztn:
 	addlw	0x30
 	call	usart_putchar
 	return
+;--------------------------------------------------------------------	
+usart_hex2ascii:
+    ;High byte first
+    movwf temp2
+    swapf temp2, w
+    andlw 0x0f
+    call usart_hex2ascii_nb
+    movf temp2, w
+    andlw 0x0f
+    call usart_hex2ascii_nb
+    
+    return
 	
 ;--------------------------------------------------------------------
 GLOBAL usart_init
@@ -103,7 +118,7 @@ GLOBAL usart_putchar
 GLOBAL usart_getchar
 GLOBAL usart_newline
 GLOBAL usart_getmessages
-GLOBAL usart_hex2ascii
+GLOBAL usart_hex2ascii	
 	
     END
 

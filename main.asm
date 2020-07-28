@@ -26,8 +26,8 @@
 
 
 ; CONFIG1L
-CONFIG OSC = HS         ; Oscillator Selection bits (HS oscillator)
-CONFIG OSCS = ON       ; Oscillator System Clock Switch Enable bit (Oscillator system clock switch option is disabled (main oscillator is source))
+CONFIG OSC = HSPLL         ; Oscillator Selection bits (HS oscillator)
+CONFIG OSCS = OFF       ; Oscillator System Clock Switch Enable bit (Oscillator system clock switch option is disabled (main oscillator is source))
 
 ; CONFIG2L
 CONFIG PWRT = OFF       ; Power-up Timer Enable bit (PWRT disabled)
@@ -89,9 +89,18 @@ CONFIG EBTR3 = OFF      ; Table Read Protection bit (Block 3 (006000-007FFFh) no
 #define         SRAM_WE_LAT           LATA
 #define         SRAM_WE_TRIS          TRISA 
 
-#define		Z80_RESET_PIN         7
-#define		Z80_RESET_LAT         LATD
-#define		Z80_RESET_TRIS        TRISD
+#define		Z80_RESET_PIN         4
+#define		Z80_RESET_LAT         LATB
+#define		Z80_RESET_TRIS        TRISB
+ 
+#define		Z80_BUSACK_PIN        2
+#define		Z80_BUSACK_LAT        LATB
+#define		Z80_BUSACK_TRIS       TRISB
+#define		Z80_BUSACK_PORT       PORTB 
+ 
+#define		Z80_WAIT_PIN         1
+#define		Z80_WAIT_LAT         LATB
+#define		Z80_WAIT_TRIS        TRISB
  
 SRAM_CS1_HI MACRO
 	    bsf     SRAM_CS1_LAT, SRAM_CS1_PIN
@@ -245,34 +254,40 @@ HighInt:
 		movff	STATUS,STATUS_TEMP	;save STATUS register
 		movff	WREG,WREG_TEMP		;save working register
 		movff	BSR,BSR_TEMP		;save BSR register
+		;pull wait line low
+		bcf Z80_WAIT_LAT, Z80_WAIT_PIN
 		
+		;movff LATD, WREG
+		
+		; should check M1 line low as well
 		;	*** high priority interrupt code goes here ***
 		;Check ext INT0
-		btfsc INTCON, INT0IF
-		bra int0_handle
+		btfsc PIR1, PSPIF
+		bra psp_handle
 		bra int_exit
 		
-int0_handle:
-		bsf LATD, 6
-		
-		;Read addressbus
+psp_handle:
 		call addressbus_read
+		movff PORTD, temp
+		;xorlw 0x55
+		;bnz psp_exit
+		bsf LATB, 3
+		;movff LATD, WREG
+		;andlw 0x0f
+		;movlw 'P'
+		movf temp, w
+		call usart_hex2ascii
+		call usart_newline
+		
 		movf addressbus_val, w
-		xorlw 0x05
-		bz int_latch_op
-		bra int0_exit
-int_latch_op:
-		call databus_read
-		xorlw 0x00
-		bz int_latch_reset
-		bra int_latch_set
-int_latch_reset:
-		bcf LATD, 6
-		bra int0_exit
-int_latch_set:
-		bsf LATD, 6
-int0_exit:    
-		bcf INTCON, INT0IF
+		call usart_hex2ascii
+		call usart_newline
+		
+		
+		
+psp_exit:    
+		bcf PIR1, PSPIF
+		bsf Z80_WAIT_LAT, Z80_WAIT_PIN
 int_exit:
     
 		movff	BSR_TEMP,BSR		;restore BSR register
@@ -290,6 +305,11 @@ Main:
     bcf Z80_RESET_LAT, Z80_RESET_PIN
     bcf Z80_RESET_TRIS, Z80_RESET_PIN
     
+    bsf Z80_BUSACK_TRIS, Z80_BUSACK_PIN
+    
+    bsf Z80_WAIT_LAT, Z80_WAIT_PIN
+    bcf Z80_WAIT_TRIS, Z80_WAIT_PIN
+    
     call usart_init
     
     call ssp_init
@@ -306,13 +326,12 @@ Main:
     
     ;io req pins
     ;int
-    bcf TRISD, 6
-    bcf LATD, 6
+    ;bcf TRISD, 6
+    ;bcf LATD, 6
     ;wr
-    bsf TRISD, 5
-    
-    
-    ;call 
+    ;bsf TRISD, 5
+    bcf LATB, 3
+    bcf TRISB, 3
     
     call databus_init
     call addressbus_init
@@ -330,13 +349,18 @@ Main:
 ;    SRAM_WRITE 0x0007, 0x00
     
     SRAM_WRITE 0x0000, 0x3e
-    SRAM_WRITE 0x0001, 0x01
+    SRAM_WRITE 0x0001, 0x87
     SRAM_WRITE 0x0002, 0xd3
-    SRAM_WRITE 0x0003, 0x05
+    SRAM_WRITE 0x0003, 0x07
     SRAM_WRITE 0x0004, 0xc3
     SRAM_WRITE 0x0005, 0x00
     SRAM_WRITE 0x0006, 0x00
-    SRAM_WRITE 0x0007, 0x76
+    SRAM_WRITE 0x0007, 0x00
+    SRAM_WRITE 0x0008, 0x00
+    SRAM_WRITE 0x0009, 0x00
+    
+    ;nop
+    ;nop
     
 ;    SRAM_WRITE 0x0000, 0x01
 ;    SRAM_WRITE 0x0001, 0x3e
@@ -348,10 +372,14 @@ Main:
 ;    SRAM_WRITE 0x0005, 0x00
 ;    SRAM_WRITE 0x0006, 0x76
     
-     
-    call z80_reset
+    
     call release_control
+ 
+    call z80_reset
     call become_iomode
+    ;call z80_reset
+    
+    
     ;call z80_reset
 main_loop:
     
@@ -363,8 +391,9 @@ main_loop:
     ;bsf LATA, 1
     ;SRAM_CS2_HI
     
-    movlw 'X'
-    call usart_putchar
+    ;movlw 0x0f
+    ;call usart_hex2ascii
+    ;call usart_putchar
     
 ;    movlw 0x00
 ;    call addressbusmode_set
@@ -460,11 +489,6 @@ sram_write:
     SRAM_CS1_LO
     SRAM_WE_LO
     
-    nop
-    nop
-    nop
-    nop
-    
     SRAM_WE_HI
     SRAM_CS1_HI
     
@@ -518,31 +542,53 @@ z80_reset:
     bcf Z80_RESET_LAT, Z80_RESET_PIN
     bcf Z80_RESET_TRIS, Z80_RESET_PIN
     
-    movlw .255
+    movlw .50
     call delay_millis
-    movlw .255
-    call delay_millis
-    movlw .255
-    call delay_millis
+    ;movlw .255
+    ;call delay_millis
+    ;movlw .255
+    ;call delay_millis
+    ;movlw .255
+    ;call delay_millis
     
-    bsf Z80_RESET_TRIS, Z80_RESET_PIN
+    bsf Z80_RESET_LAT, Z80_RESET_PIN
+    ;bsf Z80_RESET_TRIS, Z80_RESET_PIN
+    
+wait_busack:
+    btfss Z80_BUSACK_PORT, Z80_BUSACK_PIN
+    bra  wait_busack    
+    
+    ;nop
     
     return
     
 become_iomode:
     ; enable ioreq interrupts, falling edge
-    bcf INTCON2, INTEDG0
-    bcf INTCON, INT0IF
-    bsf INTCON, INT0IE
+;    bcf INTCON2, INTEDG0
+;    bcf INTCON, INT0IF
+;    bsf INTCON, INT0IE
     
     ;disable priority interrupts
     bcf RCON, IPEN
     
+    ;PSP pins
+    bsf TRISE, 0
+    bsf TRISE, 1
+    bsf TRISE, 2
+    
+    ;PSP mode
+    bsf TRISE, 4
+    
+    setf TRISD
+    
+    ;PSP interrupt enable
+    bcf PIR1, PSPIF
+    bsf PIE1, PSPIE
     bsf INTCON, 6 ; PEIE
     bsf INTCON, 7 ; GIE
     
-    
     return
+    
     END
 
 

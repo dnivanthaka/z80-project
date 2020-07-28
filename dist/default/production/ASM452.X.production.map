@@ -1,5 +1,5 @@
 MPLINK 5.08, LINKER
-Linker Map File - Created Mon Jul 27 12:33:54 2020
+Linker Map File - Created Tue Jul 28 12:40:43 2020
 
                                  Section Info
                   Section       Type    Address   Location Size(Bytes)
@@ -7,8 +7,8 @@ Linker Map File - Created Mon Jul 27 12:33:54 2020
                    .org_0       code   0x000000    program   0x000004
                    .cinit    romdata   0x000004    program   0x000002
                    .org_1       code   0x000008    program   0x000002
-                   .org_2       code   0x000018    program   0x0001d8
-                    .code       code   0x0001f0    program   0x000320
+                   .org_2       code   0x000018    program   0x0001ee
+                    .code       code   0x000206    program   0x000338
 .config_300001_BUILD/DEFAULT/PRODUCTION/MAIN.O    romdata   0x300001    program   0x000001
 .config_300002_BUILD/DEFAULT/PRODUCTION/MAIN.O    romdata   0x300002    program   0x000001
 .config_300003_BUILD/DEFAULT/PRODUCTION/MAIN.O    romdata   0x300003    program   0x000001
@@ -19,7 +19,7 @@ Linker Map File - Created Mon Jul 27 12:33:54 2020
 .config_30000A_BUILD/DEFAULT/PRODUCTION/MAIN.O    romdata   0x30000a    program   0x000001
 .config_30000B_BUILD/DEFAULT/PRODUCTION/MAIN.O    romdata   0x30000b    program   0x000001
 .config_30000C_BUILD/DEFAULT/PRODUCTION/MAIN.O    romdata   0x30000c    program   0x000001
-                   .udata      udata   0x000080       data   0x00000c
+                   .udata      udata   0x000080       data   0x00000d
 
 
 
@@ -28,11 +28,11 @@ Linker Map File - Created Mon Jul 27 12:33:54 2020
                            ---------   ---------      
                             0x000000    0x000005      
                             0x000008    0x000009      
-                            0x000018    0x00050f      
+                            0x000018    0x00053d      
                             0x300001    0x300003      
                             0x300005    0x300006      
                             0x300008    0x30000c      
-            1290 out of 33048 program addresses used, program memory utilization is 3%
+            1336 out of 33048 program addresses used, program memory utilization is 4%
 
 
 
@@ -40,69 +40,69 @@ Linker Map File - Created Mon Jul 27 12:33:54 2020
                      Name    Address   Location    Storage File                     
                 ---------  ---------  ---------  --------- ---------                
                   HighInt   0x000032    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-                     Main   0x000072    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-           _ab_mode_input   0x00033a    program     static /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
-          _ab_mode_output   0x000354    program     static /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
-           _db_mode_input   0x0002ac    program     static /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
-          _db_mode_output   0x0002be    program     static /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
-          addressbus_init   0x00032a    program     extern /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
-          addressbus_read   0x00036e    program     extern /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
-         addressbus_write   0x000388    program     extern /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
-       addressbusmode_set   0x000332    program     extern /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
-            become_iomode   0x0001e2    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-             databus_init   0x00029e    program     extern /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
-             databus_read   0x000304    program     extern /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
-            databus_write   0x0002d0    program     extern /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
-          databusmode_set   0x0002a6    program     extern /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
-             delay_millis   0x0001fa    program     extern /home/dinusha/MPLABXProjects/ASM452.X/delays.asm
-                 delay_us   0x0001f0    program     extern /home/dinusha/MPLABXProjects/ASM452.X/delays.asm
-                  dm_loop   0x0001f2    program     static /home/dinusha/MPLABXProjects/ASM452.X/delays.asm
-                 dmi_loop   0x0001fc    program     static /home/dinusha/MPLABXProjects/ASM452.X/delays.asm
-                int0_exit   0x000062    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-              int0_handle   0x000044    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-                 int_exit   0x000064    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-             int_latch_op   0x000052    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-          int_latch_reset   0x00005c    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-            int_latch_set   0x000060    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-                main_loop   0x000118    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-            mcp23s17_init   0x00021c    program     extern /home/dinusha/MPLABXProjects/ASM452.X/mcp23s17.asm
-            mcp23s17_read   0x00024c    program     extern /home/dinusha/MPLABXProjects/ASM452.X/mcp23s17.asm
-           mcp23s17_write   0x000234    program     extern /home/dinusha/MPLABXProjects/ASM452.X/mcp23s17.asm
-                 mcu_init   0x000130    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-            read_complete   0x000296    program     static /home/dinusha/MPLABXProjects/ASM452.X/ssp_hw.asm
-          release_control   0x0001b4    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-            sram_deselect   0x00019a    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-                sram_init   0x0001a2    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-                sram_read   0x00013c    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-               sram_write   0x000166    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-                 ssp_init   0x000264    program     extern /home/dinusha/MPLABXProjects/ASM452.X/ssp_hw.asm
-                 ssp_read   0x00028e    program     extern /home/dinusha/MPLABXProjects/ASM452.X/ssp_hw.asm
-                ssp_write   0x00027c    program     extern /home/dinusha/MPLABXProjects/ASM452.X/ssp_hw.asm
-           sw_serial_done   0x0004f4    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
-           sw_serial_loop   0x0004e0    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
-            sw_serial_one   0x0004f2    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
-           sw_serial_zero   0x0004ec    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
-            usart_getchar   0x0003c0    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
-        usart_getmessages   0x0003d6    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
-          usart_hex2ascii   0x0004a6    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
-               usart_init   0x0003a2    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
-            usart_newline   0x0003c8    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
-            usart_putchar   0x0003b8    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
-            usart_sw_init   0x00050a    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
-         usart_sw_putchar   0x0004d2    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
-           write_complete   0x000284    program     static /home/dinusha/MPLABXProjects/ASM452.X/ssp_hw.asm
-                z80_reset   0x0001c8    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-                      ztn   0x0004c8    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
+                     Main   0x000076    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+           _ab_mode_input   0x000354    program     static /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
+          _ab_mode_output   0x00036e    program     static /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
+           _db_mode_input   0x0002c6    program     static /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
+          _db_mode_output   0x0002d8    program     static /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
+          addressbus_init   0x000344    program     extern /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
+          addressbus_read   0x000388    program     extern /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
+         addressbus_write   0x0003a2    program     extern /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
+       addressbusmode_set   0x00034c    program     extern /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
+            become_iomode   0x0001f0    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+             databus_init   0x0002b6    program     extern /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
+             databus_read   0x00031e    program     extern /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
+            databus_write   0x0002ea    program     extern /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
+          databusmode_set   0x0002c0    program     extern /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
+             delay_millis   0x000212    program     extern /home/dinusha/MPLABXProjects/ASM452.X/delays.asm
+                 delay_us   0x000206    program     extern /home/dinusha/MPLABXProjects/ASM452.X/delays.asm
+                  dm_loop   0x000208    program     static /home/dinusha/MPLABXProjects/ASM452.X/delays.asm
+                 dmi_loop   0x000214    program     static /home/dinusha/MPLABXProjects/ASM452.X/delays.asm
+                 int_exit   0x000068    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+                main_loop   0x00013c    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+            mcp23s17_init   0x000234    program     extern /home/dinusha/MPLABXProjects/ASM452.X/mcp23s17.asm
+            mcp23s17_read   0x000264    program     extern /home/dinusha/MPLABXProjects/ASM452.X/mcp23s17.asm
+           mcp23s17_write   0x00024c    program     extern /home/dinusha/MPLABXProjects/ASM452.X/mcp23s17.asm
+                 mcu_init   0x00014e    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+                 psp_exit   0x000064    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+               psp_handle   0x000046    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+            read_complete   0x0002ae    program     static /home/dinusha/MPLABXProjects/ASM452.X/ssp_hw.asm
+          release_control   0x0001ca    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+            sram_deselect   0x0001b0    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+                sram_init   0x0001b8    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+                sram_read   0x00015a    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+               sram_write   0x000184    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+                 ssp_init   0x00027c    program     extern /home/dinusha/MPLABXProjects/ASM452.X/ssp_hw.asm
+                 ssp_read   0x0002a6    program     extern /home/dinusha/MPLABXProjects/ASM452.X/ssp_hw.asm
+                ssp_write   0x000294    program     extern /home/dinusha/MPLABXProjects/ASM452.X/ssp_hw.asm
+           sw_serial_done   0x000522    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
+           sw_serial_loop   0x00050e    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
+            sw_serial_one   0x000520    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
+           sw_serial_zero   0x00051a    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
+            usart_getchar   0x0003da    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
+        usart_getmessages   0x0003f0    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
+          usart_hex2ascii   0x0004ec    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
+       usart_hex2ascii_nb   0x0004c0    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
+               usart_init   0x0003bc    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
+            usart_newline   0x0003e2    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
+            usart_putchar   0x0003d2    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
+            usart_sw_init   0x000538    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
+         usart_sw_putchar   0x000500    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
+              wait_busack   0x0001ea    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+           write_complete   0x00029c    program     static /home/dinusha/MPLABXProjects/ASM452.X/ssp_hw.asm
+                z80_reset   0x0001de    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+                      ztn   0x0004e2    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
               DELAY1_TEMP   0x000080       data     static /home/dinusha/MPLABXProjects/ASM452.X/delays.asm
               DELAY2_TEMP   0x000081       data     static /home/dinusha/MPLABXProjects/ASM452.X/delays.asm
             MCP23X17_DATA   0x000083       data     extern /home/dinusha/MPLABXProjects/ASM452.X/mcp23s17.asm
              MCP23X17_REG   0x000082       data     extern /home/dinusha/MPLABXProjects/ASM452.X/mcp23s17.asm
                    TXDATA   0x000084       data     static /home/dinusha/MPLABXProjects/ASM452.X/ssp_hw.asm
            addressbus_val   0x000086       data     extern /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
-                  counter   0x00008a       data     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
+                  counter   0x00008b       data     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
                   db_temp   0x000085       data     static /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
-                    tdata   0x000089       data     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
+                    tdata   0x00008a       data     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
                      temp   0x000088       data     static /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
+                    temp2   0x000089       data     static /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
 
 
 
@@ -110,59 +110,58 @@ Linker Map File - Created Mon Jul 27 12:33:54 2020
                      Name    Address   Location    Storage File                     
                 ---------  ---------  ---------  --------- ---------                
                   HighInt   0x000032    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-              int0_handle   0x000044    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-             int_latch_op   0x000052    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-          int_latch_reset   0x00005c    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-            int_latch_set   0x000060    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-                int0_exit   0x000062    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-                 int_exit   0x000064    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-                     Main   0x000072    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-                main_loop   0x000118    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-                 mcu_init   0x000130    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-                sram_read   0x00013c    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-               sram_write   0x000166    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-            sram_deselect   0x00019a    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-                sram_init   0x0001a2    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-          release_control   0x0001b4    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-                z80_reset   0x0001c8    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-            become_iomode   0x0001e2    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
-                 delay_us   0x0001f0    program     extern /home/dinusha/MPLABXProjects/ASM452.X/delays.asm
-                  dm_loop   0x0001f2    program     static /home/dinusha/MPLABXProjects/ASM452.X/delays.asm
-             delay_millis   0x0001fa    program     extern /home/dinusha/MPLABXProjects/ASM452.X/delays.asm
-                 dmi_loop   0x0001fc    program     static /home/dinusha/MPLABXProjects/ASM452.X/delays.asm
-            mcp23s17_init   0x00021c    program     extern /home/dinusha/MPLABXProjects/ASM452.X/mcp23s17.asm
-           mcp23s17_write   0x000234    program     extern /home/dinusha/MPLABXProjects/ASM452.X/mcp23s17.asm
-            mcp23s17_read   0x00024c    program     extern /home/dinusha/MPLABXProjects/ASM452.X/mcp23s17.asm
-                 ssp_init   0x000264    program     extern /home/dinusha/MPLABXProjects/ASM452.X/ssp_hw.asm
-                ssp_write   0x00027c    program     extern /home/dinusha/MPLABXProjects/ASM452.X/ssp_hw.asm
-           write_complete   0x000284    program     static /home/dinusha/MPLABXProjects/ASM452.X/ssp_hw.asm
-                 ssp_read   0x00028e    program     extern /home/dinusha/MPLABXProjects/ASM452.X/ssp_hw.asm
-            read_complete   0x000296    program     static /home/dinusha/MPLABXProjects/ASM452.X/ssp_hw.asm
-             databus_init   0x00029e    program     extern /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
-          databusmode_set   0x0002a6    program     extern /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
-           _db_mode_input   0x0002ac    program     static /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
-          _db_mode_output   0x0002be    program     static /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
-            databus_write   0x0002d0    program     extern /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
-             databus_read   0x000304    program     extern /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
-          addressbus_init   0x00032a    program     extern /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
-       addressbusmode_set   0x000332    program     extern /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
-           _ab_mode_input   0x00033a    program     static /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
-          _ab_mode_output   0x000354    program     static /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
-          addressbus_read   0x00036e    program     extern /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
-         addressbus_write   0x000388    program     extern /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
-               usart_init   0x0003a2    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
-            usart_putchar   0x0003b8    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
-            usart_getchar   0x0003c0    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
-            usart_newline   0x0003c8    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
-        usart_getmessages   0x0003d6    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
-          usart_hex2ascii   0x0004a6    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
-                      ztn   0x0004c8    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
-         usart_sw_putchar   0x0004d2    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
-           sw_serial_loop   0x0004e0    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
-           sw_serial_zero   0x0004ec    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
-            sw_serial_one   0x0004f2    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
-           sw_serial_done   0x0004f4    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
-            usart_sw_init   0x00050a    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
+               psp_handle   0x000046    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+                 psp_exit   0x000064    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+                 int_exit   0x000068    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+                     Main   0x000076    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+                main_loop   0x00013c    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+                 mcu_init   0x00014e    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+                sram_read   0x00015a    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+               sram_write   0x000184    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+            sram_deselect   0x0001b0    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+                sram_init   0x0001b8    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+          release_control   0x0001ca    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+                z80_reset   0x0001de    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+              wait_busack   0x0001ea    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+            become_iomode   0x0001f0    program     static /home/dinusha/MPLABXProjects/ASM452.X/main.asm
+                 delay_us   0x000206    program     extern /home/dinusha/MPLABXProjects/ASM452.X/delays.asm
+                  dm_loop   0x000208    program     static /home/dinusha/MPLABXProjects/ASM452.X/delays.asm
+             delay_millis   0x000212    program     extern /home/dinusha/MPLABXProjects/ASM452.X/delays.asm
+                 dmi_loop   0x000214    program     static /home/dinusha/MPLABXProjects/ASM452.X/delays.asm
+            mcp23s17_init   0x000234    program     extern /home/dinusha/MPLABXProjects/ASM452.X/mcp23s17.asm
+           mcp23s17_write   0x00024c    program     extern /home/dinusha/MPLABXProjects/ASM452.X/mcp23s17.asm
+            mcp23s17_read   0x000264    program     extern /home/dinusha/MPLABXProjects/ASM452.X/mcp23s17.asm
+                 ssp_init   0x00027c    program     extern /home/dinusha/MPLABXProjects/ASM452.X/ssp_hw.asm
+                ssp_write   0x000294    program     extern /home/dinusha/MPLABXProjects/ASM452.X/ssp_hw.asm
+           write_complete   0x00029c    program     static /home/dinusha/MPLABXProjects/ASM452.X/ssp_hw.asm
+                 ssp_read   0x0002a6    program     extern /home/dinusha/MPLABXProjects/ASM452.X/ssp_hw.asm
+            read_complete   0x0002ae    program     static /home/dinusha/MPLABXProjects/ASM452.X/ssp_hw.asm
+             databus_init   0x0002b6    program     extern /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
+          databusmode_set   0x0002c0    program     extern /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
+           _db_mode_input   0x0002c6    program     static /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
+          _db_mode_output   0x0002d8    program     static /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
+            databus_write   0x0002ea    program     extern /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
+             databus_read   0x00031e    program     extern /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
+          addressbus_init   0x000344    program     extern /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
+       addressbusmode_set   0x00034c    program     extern /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
+           _ab_mode_input   0x000354    program     static /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
+          _ab_mode_output   0x00036e    program     static /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
+          addressbus_read   0x000388    program     extern /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
+         addressbus_write   0x0003a2    program     extern /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
+               usart_init   0x0003bc    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
+            usart_putchar   0x0003d2    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
+            usart_getchar   0x0003da    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
+            usart_newline   0x0003e2    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
+        usart_getmessages   0x0003f0    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
+       usart_hex2ascii_nb   0x0004c0    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
+                      ztn   0x0004e2    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
+          usart_hex2ascii   0x0004ec    program     extern /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
+         usart_sw_putchar   0x000500    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
+           sw_serial_loop   0x00050e    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
+           sw_serial_zero   0x00051a    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
+            sw_serial_one   0x000520    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
+           sw_serial_done   0x000522    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
+            usart_sw_init   0x000538    program     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
               DELAY1_TEMP   0x000080       data     static /home/dinusha/MPLABXProjects/ASM452.X/delays.asm
               DELAY2_TEMP   0x000081       data     static /home/dinusha/MPLABXProjects/ASM452.X/delays.asm
              MCP23X17_REG   0x000082       data     extern /home/dinusha/MPLABXProjects/ASM452.X/mcp23s17.asm
@@ -171,7 +170,8 @@ Linker Map File - Created Mon Jul 27 12:33:54 2020
                   db_temp   0x000085       data     static /home/dinusha/MPLABXProjects/ASM452.X/databus.asm
            addressbus_val   0x000086       data     extern /home/dinusha/MPLABXProjects/ASM452.X/addressbus.asm
                      temp   0x000088       data     static /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
-                    tdata   0x000089       data     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
-                  counter   0x00008a       data     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
+                    temp2   0x000089       data     static /home/dinusha/MPLABXProjects/ASM452.X/usart_hw.asm
+                    tdata   0x00008a       data     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
+                  counter   0x00008b       data     static /home/dinusha/MPLABXProjects/ASM452.X/usart_sw.asm
 
 

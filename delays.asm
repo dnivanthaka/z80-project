@@ -12,7 +12,7 @@ CODE
     
 dm_loop:
     nop
-    ;nop
+    nop
     ;nop
     ;nop
     ;nop
