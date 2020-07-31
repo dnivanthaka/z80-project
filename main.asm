@@ -180,6 +180,10 @@ SRAM_READ MACRO ADDR
 ; These variables are only needed if low priority interrupts are used. 
 ; More variables may be needed to store other special function registers used
 ; in the interrupt routines.
+	   
+	;org 0x6060 ; last 8k area
+	
+	;data 0x00 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
 		CBLOCK	;0x080
 		WREG_TEMP	;variable used for context saving 
@@ -279,6 +283,7 @@ psp_handle:
 		call usart_hex2ascii
 		call usart_newline
 		
+		;call databus_read
 		movf addressbus_val, w
 		call usart_hex2ascii
 		call usart_newline
@@ -333,20 +338,27 @@ Main:
     ;call sram_deselect
     call sram_init
     
-    SRAM_WRITE 0x0000, 0x3e
-    SRAM_WRITE 0x0001, 0x87
-    SRAM_WRITE 0x0002, 0xd3
-    SRAM_WRITE 0x0003, 0x07
-    SRAM_WRITE 0x0004, 0xc3
+    SRAM_WRITE 0x0000, 0xf3               ; di
+    SRAM_WRITE 0x0001, 0x3e		  ;LD a,     
+    SRAM_WRITE 0x0002, 0x03		  ;0x82       ; port value 
+    SRAM_WRITE 0x0003, 0xd3               ;OUT
+    SRAM_WRITE 0x0004, 0x00		  ; (0x00), a ; port address 
     SRAM_WRITE 0x0005, 0x00
     SRAM_WRITE 0x0006, 0x00
     SRAM_WRITE 0x0007, 0x00
     SRAM_WRITE 0x0008, 0x00
     SRAM_WRITE 0x0009, 0x00
+    SRAM_WRITE 0x000A, 0x00
+    SRAM_WRITE 0x000B, 0x00
+    SRAM_WRITE 0x000C, 0x00
+    SRAM_WRITE 0x000D, 0x00
+    SRAM_WRITE 0x000E, 0xc3
+    SRAM_WRITE 0x000F, 0x01
+    
+    SRAM_WRITE 0x0010, 0x00
     
     
     call release_control
- 
     call z80_reset
     call become_iomode
     
@@ -530,6 +542,9 @@ wait_busack:
     btfss Z80_BUSACK_PORT, Z80_BUSACK_PIN
     bra  wait_busack    
     
+    nop
+    ;nop
+    ;nop
     ;nop
     
     return
