@@ -7,17 +7,17 @@ UDATA
  
 CODE	
  
- delay_us:                           ; 40Mhz / 10 clock = 1us (1000ns) instruction cycle
+ delay_us:                           ; 40Mhz / 10 = 10Mhz clock = 0.1us (100ns) instruction cycle
     movwf DELAY1_TEMP
     
 dm_loop:
     nop
     nop
-    ;nop
-    ;nop
-    ;nop
-    ;nop
-    ;nop
+    nop
+    nop
+    nop
+    nop
+    nop
     ;nop
     decfsz DELAY1_TEMP, f
     bra dm_loop

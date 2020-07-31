@@ -279,6 +279,9 @@ psp_handle:
 		;movff LATD, WREG
 		;andlw 0x0f
 		;movlw 'P'
+		movlw 'L'
+		call usart_putchar
+		
 		movf temp, w
 		call usart_hex2ascii
 		call usart_newline
@@ -340,9 +343,9 @@ Main:
     
     SRAM_WRITE 0x0000, 0xf3               ; di
     SRAM_WRITE 0x0001, 0x3e		  ;LD a,     
-    SRAM_WRITE 0x0002, 0x03		  ;0x82       ; port value 
+    SRAM_WRITE 0x0002, 0x02		  ;port value e.g. 0x03 
     SRAM_WRITE 0x0003, 0xd3               ;OUT
-    SRAM_WRITE 0x0004, 0x00		  ; (0x00), a ; port address 
+    SRAM_WRITE 0x0004, 0x00		  ; e.g. (0x00), a ; port address 
     SRAM_WRITE 0x0005, 0x00
     SRAM_WRITE 0x0006, 0x00
     SRAM_WRITE 0x0007, 0x00
@@ -469,6 +472,8 @@ sram_write:
     SRAM_OE_HI
     SRAM_CS1_LO
     SRAM_WE_LO
+    
+    nop
     
     SRAM_WE_HI
     SRAM_CS1_HI

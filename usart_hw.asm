@@ -15,9 +15,10 @@ usart_init:
     clrf RCREG
     ;bsf PIR1, TXIF
     
-    movlw 0x6A
+    movlw 0x81                     ; 19200 @ 40Mhz
+    ;movlw 0x6A
     ;movlw 0x40                   ; 19200
-    ;movlw 0x1F                    ; 19200 @ 40Mhz
+    ;movlw 0x1F                    ; 19200
     movwf SPBRG
     
     movlw 0x24
