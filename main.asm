@@ -102,6 +102,15 @@ CONFIG EBTR3 = OFF      ; Table Read Protection bit (Block 3 (006000-007FFFh) no
 #define		Z80_WAIT_LAT         LATB
 #define		Z80_WAIT_TRIS        TRISB
  
+#define		BUS_LATCH_PIN         0
+#define		BUS_LATCH_LAT         LATB
+#define		BUS_LATCH_TRIS        TRISB
+ 
+#define		ADDRESS_PIN           2
+#define		ADDRESS_LAT           LATC
+#define		ADDRESS_TRIS          TRISC
+#define		ADDRESS_PORT          PORTC
+ 
 SRAM_CS1_HI MACRO
 	    bsf     SRAM_CS1_LAT, SRAM_CS1_PIN
 	    ENDM 
@@ -227,7 +236,9 @@ SRAM_READ MACRO ADDR
 ; when any interrupt occurs if interrupt priorities are not enabled.
 
 		ORG	0x0008
-
+		
+		bcf Z80_WAIT_LAT, Z80_WAIT_PIN
+		
 		bra	HighInt		;go to high priority interrupt routine
 
 ;******************************************************************************
@@ -258,8 +269,7 @@ HighInt:
 		movff	STATUS,STATUS_TEMP	;save STATUS register
 		movff	WREG,WREG_TEMP		;save working register
 		movff	BSR,BSR_TEMP		;save BSR register
-		;pull wait line low
-		bcf Z80_WAIT_LAT, Z80_WAIT_PIN
+
 		
 		;movff LATD, WREG
 		
@@ -271,6 +281,11 @@ HighInt:
 		bra int_exit
 		
 psp_handle:
+		btfsc ADDRESS_PORT, ADDRESS_PIN
+		goto int_exit
+    
+		movlw 0x55
+		movwf LATD
 		call addressbus_read
 		movff PORTD, temp
 		;xorlw 0x55
@@ -282,25 +297,31 @@ psp_handle:
 		movlw 'L'
 		;call usart_putchar
 		
-;		movf temp, w
-;		call usart_hex2ascii
+		movf temp, w
+		call usart_hex2ascii
 		;call usart_newline
 		
 		;call databus_read
-;		movf addressbus_val, w
-;		call usart_hex2ascii
-;		call usart_newline
+		movf addressbus_val, w
+		call usart_hex2ascii
+		call usart_newline
 		
 		
 		
 psp_exit:    
 		bcf PIR1, PSPIF
-		bsf Z80_WAIT_LAT, Z80_WAIT_PIN
+;		bsf Z80_WAIT_LAT, Z80_WAIT_PIN
+;		nop
+		;reset line low
+;		bcf Z80_WAIT_LAT, Z80_WAIT_PIN
 int_exit:
     
 		movff	BSR_TEMP,BSR		;restore BSR register
 		movff	WREG_TEMP,WREG		;restore working register
 		movff	STATUS_TEMP,STATUS	;restore STATUS register
+		
+		bsf Z80_WAIT_LAT, Z80_WAIT_PIN
+		
 		retfie	FAST
 
 ;******************************************************************************
@@ -317,6 +338,8 @@ Main:
     
     bsf Z80_WAIT_LAT, Z80_WAIT_PIN
     bcf Z80_WAIT_TRIS, Z80_WAIT_PIN
+    
+    bsf ADDRESS_TRIS, ADDRESS_PIN
     
     call usart_init
     
@@ -367,8 +390,6 @@ write_sram_from_rom:
     
     incf addressbus_val+1, f
     
-    ;clrf rom_counter_lo
-    ;clrf addressbus_val
     movf addressbus_val+1, w
     xorlw 0x04
     bnz write_sram_from_rom
@@ -407,11 +428,20 @@ write_sram_from_rom:
     call z80_reset
     call become_iomode
     
+    ;movlw 0x55
+    ;movwf LATD
+    
 main_loop:
     
     ;xorlw 0x80
 ;    btfss temp, 7
 ;    bra main_loop
+    
+    call addressbus_read
+    movf addressbus_val, w
+    call usart_hex2ascii
+    call usart_newline
+    
     
     bsf LATA, 0
     ;bsf LATA, 1
@@ -461,6 +491,9 @@ mcu_init:
     
     clrf CCP1CON
     clrf CCP2CON                ; disable comparator
+    
+    bsf BUS_LATCH_LAT, BUS_LATCH_PIN ; A -> B
+    bcf BUS_LATCH_TRIS, BUS_LATCH_PIN
     
     return
 ;----------------------------------------------------------------    
@@ -629,6 +662,9 @@ become_iomode:
     bsf PIE1, PSPIE
     bsf INTCON, 6 ; PEIE
     bsf INTCON, 7 ; GIE
+    
+    bcf BUS_LATCH_LAT, BUS_LATCH_PIN ; B -> A
+    bsf Z80_WAIT_LAT, Z80_WAIT_PIN
     
     return
 ;-------------------------------------------------------

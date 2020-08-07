@@ -98,7 +98,7 @@ ${OBJECTDIR}/delays.o: delays.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/delays.o.d 
 	@${RM} ${OBJECTDIR}/delays.o 
-	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/delays.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_PICKIT2=1 -q -p$(MP_PROCESSOR_OPTION) -u  -l\\\"${OBJECTDIR}/delays.lst\\\" -e\\\"${OBJECTDIR}/delays.err\\\" $(ASM_OPTIONS)    -o\\\"${OBJECTDIR}/delays.o\\\" \\\"delays.asm\\\" 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/delays.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_PK3=1 -q -p$(MP_PROCESSOR_OPTION) -u  -l\\\"${OBJECTDIR}/delays.lst\\\" -e\\\"${OBJECTDIR}/delays.err\\\" $(ASM_OPTIONS)    -o\\\"${OBJECTDIR}/delays.o\\\" \\\"delays.asm\\\" 
 	@${DEP_GEN} -d "${OBJECTDIR}/delays.o"
 	@${FIXDEPS} "${OBJECTDIR}/delays.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
@@ -106,7 +106,7 @@ ${OBJECTDIR}/main.o: main.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/main.o.d 
 	@${RM} ${OBJECTDIR}/main.o 
-	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/main.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_PICKIT2=1 -q -p$(MP_PROCESSOR_OPTION) -u  -l\\\"${OBJECTDIR}/main.lst\\\" -e\\\"${OBJECTDIR}/main.err\\\" $(ASM_OPTIONS)    -o\\\"${OBJECTDIR}/main.o\\\" \\\"main.asm\\\" 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/main.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_PK3=1 -q -p$(MP_PROCESSOR_OPTION) -u  -l\\\"${OBJECTDIR}/main.lst\\\" -e\\\"${OBJECTDIR}/main.err\\\" $(ASM_OPTIONS)    -o\\\"${OBJECTDIR}/main.o\\\" \\\"main.asm\\\" 
 	@${DEP_GEN} -d "${OBJECTDIR}/main.o"
 	@${FIXDEPS} "${OBJECTDIR}/main.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
@@ -114,7 +114,7 @@ ${OBJECTDIR}/mcp23s17.o: mcp23s17.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/mcp23s17.o.d 
 	@${RM} ${OBJECTDIR}/mcp23s17.o 
-	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/mcp23s17.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_PICKIT2=1 -q -p$(MP_PROCESSOR_OPTION) -u  -l\\\"${OBJECTDIR}/mcp23s17.lst\\\" -e\\\"${OBJECTDIR}/mcp23s17.err\\\" $(ASM_OPTIONS)    -o\\\"${OBJECTDIR}/mcp23s17.o\\\" \\\"mcp23s17.asm\\\" 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/mcp23s17.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_PK3=1 -q -p$(MP_PROCESSOR_OPTION) -u  -l\\\"${OBJECTDIR}/mcp23s17.lst\\\" -e\\\"${OBJECTDIR}/mcp23s17.err\\\" $(ASM_OPTIONS)    -o\\\"${OBJECTDIR}/mcp23s17.o\\\" \\\"mcp23s17.asm\\\" 
 	@${DEP_GEN} -d "${OBJECTDIR}/mcp23s17.o"
 	@${FIXDEPS} "${OBJECTDIR}/mcp23s17.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
@@ -122,7 +122,7 @@ ${OBJECTDIR}/ssp_hw.o: ssp_hw.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/ssp_hw.o.d 
 	@${RM} ${OBJECTDIR}/ssp_hw.o 
-	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/ssp_hw.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_PICKIT2=1 -q -p$(MP_PROCESSOR_OPTION) -u  -l\\\"${OBJECTDIR}/ssp_hw.lst\\\" -e\\\"${OBJECTDIR}/ssp_hw.err\\\" $(ASM_OPTIONS)    -o\\\"${OBJECTDIR}/ssp_hw.o\\\" \\\"ssp_hw.asm\\\" 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/ssp_hw.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_PK3=1 -q -p$(MP_PROCESSOR_OPTION) -u  -l\\\"${OBJECTDIR}/ssp_hw.lst\\\" -e\\\"${OBJECTDIR}/ssp_hw.err\\\" $(ASM_OPTIONS)    -o\\\"${OBJECTDIR}/ssp_hw.o\\\" \\\"ssp_hw.asm\\\" 
 	@${DEP_GEN} -d "${OBJECTDIR}/ssp_hw.o"
 	@${FIXDEPS} "${OBJECTDIR}/ssp_hw.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
@@ -130,7 +130,7 @@ ${OBJECTDIR}/databus.o: databus.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/databus.o.d 
 	@${RM} ${OBJECTDIR}/databus.o 
-	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/databus.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_PICKIT2=1 -q -p$(MP_PROCESSOR_OPTION) -u  -l\\\"${OBJECTDIR}/databus.lst\\\" -e\\\"${OBJECTDIR}/databus.err\\\" $(ASM_OPTIONS)    -o\\\"${OBJECTDIR}/databus.o\\\" \\\"databus.asm\\\" 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/databus.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_PK3=1 -q -p$(MP_PROCESSOR_OPTION) -u  -l\\\"${OBJECTDIR}/databus.lst\\\" -e\\\"${OBJECTDIR}/databus.err\\\" $(ASM_OPTIONS)    -o\\\"${OBJECTDIR}/databus.o\\\" \\\"databus.asm\\\" 
 	@${DEP_GEN} -d "${OBJECTDIR}/databus.o"
 	@${FIXDEPS} "${OBJECTDIR}/databus.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
@@ -138,7 +138,7 @@ ${OBJECTDIR}/addressbus.o: addressbus.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/addressbus.o.d 
 	@${RM} ${OBJECTDIR}/addressbus.o 
-	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/addressbus.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_PICKIT2=1 -q -p$(MP_PROCESSOR_OPTION) -u  -l\\\"${OBJECTDIR}/addressbus.lst\\\" -e\\\"${OBJECTDIR}/addressbus.err\\\" $(ASM_OPTIONS)    -o\\\"${OBJECTDIR}/addressbus.o\\\" \\\"addressbus.asm\\\" 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/addressbus.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_PK3=1 -q -p$(MP_PROCESSOR_OPTION) -u  -l\\\"${OBJECTDIR}/addressbus.lst\\\" -e\\\"${OBJECTDIR}/addressbus.err\\\" $(ASM_OPTIONS)    -o\\\"${OBJECTDIR}/addressbus.o\\\" \\\"addressbus.asm\\\" 
 	@${DEP_GEN} -d "${OBJECTDIR}/addressbus.o"
 	@${FIXDEPS} "${OBJECTDIR}/addressbus.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
@@ -146,7 +146,7 @@ ${OBJECTDIR}/usart_hw.o: usart_hw.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/usart_hw.o.d 
 	@${RM} ${OBJECTDIR}/usart_hw.o 
-	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/usart_hw.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_PICKIT2=1 -q -p$(MP_PROCESSOR_OPTION) -u  -l\\\"${OBJECTDIR}/usart_hw.lst\\\" -e\\\"${OBJECTDIR}/usart_hw.err\\\" $(ASM_OPTIONS)    -o\\\"${OBJECTDIR}/usart_hw.o\\\" \\\"usart_hw.asm\\\" 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/usart_hw.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_PK3=1 -q -p$(MP_PROCESSOR_OPTION) -u  -l\\\"${OBJECTDIR}/usart_hw.lst\\\" -e\\\"${OBJECTDIR}/usart_hw.err\\\" $(ASM_OPTIONS)    -o\\\"${OBJECTDIR}/usart_hw.o\\\" \\\"usart_hw.asm\\\" 
 	@${DEP_GEN} -d "${OBJECTDIR}/usart_hw.o"
 	@${FIXDEPS} "${OBJECTDIR}/usart_hw.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
@@ -154,7 +154,7 @@ ${OBJECTDIR}/usart_sw.o: usart_sw.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/usart_sw.o.d 
 	@${RM} ${OBJECTDIR}/usart_sw.o 
-	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/usart_sw.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_PICKIT2=1 -q -p$(MP_PROCESSOR_OPTION) -u  -l\\\"${OBJECTDIR}/usart_sw.lst\\\" -e\\\"${OBJECTDIR}/usart_sw.err\\\" $(ASM_OPTIONS)    -o\\\"${OBJECTDIR}/usart_sw.o\\\" \\\"usart_sw.asm\\\" 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/usart_sw.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_PK3=1 -q -p$(MP_PROCESSOR_OPTION) -u  -l\\\"${OBJECTDIR}/usart_sw.lst\\\" -e\\\"${OBJECTDIR}/usart_sw.err\\\" $(ASM_OPTIONS)    -o\\\"${OBJECTDIR}/usart_sw.o\\\" \\\"usart_sw.asm\\\" 
 	@${DEP_GEN} -d "${OBJECTDIR}/usart_sw.o"
 	@${FIXDEPS} "${OBJECTDIR}/usart_sw.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
@@ -162,7 +162,7 @@ ${OBJECTDIR}/rom.o: rom.asm  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/rom.o.d 
 	@${RM} ${OBJECTDIR}/rom.o 
-	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/rom.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_PICKIT2=1 -q -p$(MP_PROCESSOR_OPTION) -u  -l\\\"${OBJECTDIR}/rom.lst\\\" -e\\\"${OBJECTDIR}/rom.err\\\" $(ASM_OPTIONS)    -o\\\"${OBJECTDIR}/rom.o\\\" \\\"rom.asm\\\" 
+	@${FIXDEPS} dummy.d -e "${OBJECTDIR}/rom.err" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_PK3=1 -q -p$(MP_PROCESSOR_OPTION) -u  -l\\\"${OBJECTDIR}/rom.lst\\\" -e\\\"${OBJECTDIR}/rom.err\\\" $(ASM_OPTIONS)    -o\\\"${OBJECTDIR}/rom.o\\\" \\\"rom.asm\\\" 
 	@${DEP_GEN} -d "${OBJECTDIR}/rom.o"
 	@${FIXDEPS} "${OBJECTDIR}/rom.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
@@ -246,7 +246,7 @@ endif
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
 dist/${CND_CONF}/${IMAGE_TYPE}/ASM452.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk    
 	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
-	${MP_LD} $(MP_EXTRA_LD_PRE)   -p$(MP_PROCESSOR_OPTION)  -w -x -u_DEBUG -z__ICD2RAM=1 -m"${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"   -z__MPLAB_BUILD=1  -z__MPLAB_DEBUG=1 -z__MPLAB_DEBUGGER_PICKIT2=1 $(MP_LINKER_DEBUG_OPTION) -odist/${CND_CONF}/${IMAGE_TYPE}/ASM452.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}     
+	${MP_LD} $(MP_EXTRA_LD_PRE)   -p$(MP_PROCESSOR_OPTION)  -w -x -u_DEBUG -z__ICD2RAM=1 -m"${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"   -z__MPLAB_BUILD=1  -z__MPLAB_DEBUG=1 -z__MPLAB_DEBUGGER_PK3=1 $(MP_LINKER_DEBUG_OPTION) -odist/${CND_CONF}/${IMAGE_TYPE}/ASM452.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}     
 else
 dist/${CND_CONF}/${IMAGE_TYPE}/ASM452.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk   
 	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
