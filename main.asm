@@ -373,73 +373,11 @@ Main:
     ;call sram_deselect
     call sram_init
     
-;    movlw upper rom_data
-;    movwf TBLPTRU
-;    movlw high rom_data
-;    movwf TBLPTRH
-;    movlw low rom_data
-;    movwf TBLPTRL
-;    
-;    ;flash memory read
-;    movlw 0x80
-;    movwf EECON1
-;    
-;    clrf addressbus_val
-;    clrf addressbus_val+1
-;    
-;write_sram_from_rom:
-;    TBLRD*+
-;    nop
-;    nop
-;    ;nop
-;    movf TABLAT, w
-;    call sram_write ;call to write sram, even
-;    incfsz addressbus_val, f
-;    bra write_sram_from_rom
-;    
-;    incf addressbus_val+1, f
-;    
-;    movf addressbus_val+1, w
-;    xorlw 0x04
-;    bnz write_sram_from_rom
-    
-    
-    ;writing data to sram
-;write_rom:
-    ;movlw .256
-    ;movwf rom_counter
-    
-    ;SRAM_WRITE rom_counter
-    
-    ;decfsz rom_counter, f
-    ;bra write_rom
-    
-;    SRAM_WRITE 0x0000, 0xf3               ; di
-;    SRAM_WRITE 0x0001, 0x3e		  ;LD a,     
-;    SRAM_WRITE 0x0002, 0x02		  ;port value e.g. 0x03 
-;    SRAM_WRITE 0x0003, 0xd3               ;OUT
-;    SRAM_WRITE 0x0004, 0x00		  ; e.g. (0x00), a ; port address 
-;    SRAM_WRITE 0x0005, 0x00
-;    SRAM_WRITE 0x0006, 0x00
-;    SRAM_WRITE 0x0007, 0x00
-;    SRAM_WRITE 0x0008, 0x00
-;    SRAM_WRITE 0x0009, 0x00
-;    SRAM_WRITE 0x000A, 0x00
-;    SRAM_WRITE 0x000B, 0x00
-;    SRAM_WRITE 0x000C, 0x00
-;    SRAM_WRITE 0x000D, 0x00
-;    SRAM_WRITE 0x000E, 0xc3
-;    SRAM_WRITE 0x000F, 0x01
-;    SRAM_WRITE 0x0010, 0x00
-    
     call write_rom_to_sram
     
     call release_control
     call z80_reset
     call set_slave_mode
-    
-    ;movlw 0x55
-    ;movwf LATD
     
 main_loop:
     
@@ -595,14 +533,14 @@ sram_deselect:
 sram_init:
     ;sram pins
     
-    bcf LATA, 1
-    bcf TRISA, 1
+    bcf SRAM_CS1_LAT, SRAM_CS1_PIN
+    bcf SRAM_CS1_TRIS, SRAM_CS1_PIN
     
-    bcf LATA, 2
-    bcf TRISA, 2
+    bcf SRAM_OE_LAT, SRAM_OE_PIN
+    bcf SRAM_OE_TRIS, SRAM_OE_PIN
     
-    bcf LATA, 3
-    bcf TRISA, 3
+    bcf SRAM_WE_LAT, SRAM_WE_PIN
+    bcf SRAM_WE_TRIS, SRAM_WE_PIN
     
     call sram_deselect
     
