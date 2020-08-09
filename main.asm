@@ -109,9 +109,17 @@ CONFIG EBTR3 = OFF      ; Table Read Protection bit (Block 3 (006000-007FFFh) no
 #define		ADDRESS_PIN           2
 #define		ADDRESS_LAT           LATC
 #define		ADDRESS_TRIS          TRISC
-#define		ADDRESS_PORT          PORTC
+#define		ADDRESS_PORT          PORTC 
+
+#define _EI_ bsf INTCON, 7 ; GIE
+#define _DI_ bcf INTCON, 7 ; GIE
  
-SRAM_CS1_HI MACRO
+#define SLAVERX 0
+#define SLAVETX 1
+ 
+ 
+ 
+ SRAM_CS1_HI MACRO
 	    bsf     SRAM_CS1_LAT, SRAM_CS1_PIN
 	    ENDM 
  
@@ -133,7 +141,7 @@ SRAM_WE_HI MACRO
 	    
 SRAM_WE_LO MACRO
 	    bcf     SRAM_WE_LAT, SRAM_WE_PIN
-	    ENDM 
+	    ENDM
  
 EXTERN ssp_init
 EXTERN ssp_read
@@ -206,7 +214,8 @@ SRAM_READ MACRO ADDR
 		
 		temp
 		sram_temp
-		
+	
+		slaveflags
 		ENDC
 
 		CBLOCK	0x000
@@ -364,35 +373,35 @@ Main:
     ;call sram_deselect
     call sram_init
     
-    movlw upper rom_data
-    movwf TBLPTRU
-    movlw high rom_data
-    movwf TBLPTRH
-    movlw low rom_data
-    movwf TBLPTRL
-    
-    ;flash memory read
-    movlw 0x80
-    movwf EECON1
-    
-    clrf addressbus_val
-    clrf addressbus_val+1
-    
-write_sram_from_rom:
-    TBLRD*+
-    nop
-    nop
-    ;nop
-    movf TABLAT, w
-    call sram_write ;call to write sram, even
-    incfsz addressbus_val, f
-    bra write_sram_from_rom
-    
-    incf addressbus_val+1, f
-    
-    movf addressbus_val+1, w
-    xorlw 0x04
-    bnz write_sram_from_rom
+;    movlw upper rom_data
+;    movwf TBLPTRU
+;    movlw high rom_data
+;    movwf TBLPTRH
+;    movlw low rom_data
+;    movwf TBLPTRL
+;    
+;    ;flash memory read
+;    movlw 0x80
+;    movwf EECON1
+;    
+;    clrf addressbus_val
+;    clrf addressbus_val+1
+;    
+;write_sram_from_rom:
+;    TBLRD*+
+;    nop
+;    nop
+;    ;nop
+;    movf TABLAT, w
+;    call sram_write ;call to write sram, even
+;    incfsz addressbus_val, f
+;    bra write_sram_from_rom
+;    
+;    incf addressbus_val+1, f
+;    
+;    movf addressbus_val+1, w
+;    xorlw 0x04
+;    bnz write_sram_from_rom
     
     
     ;writing data to sram
@@ -423,10 +432,11 @@ write_sram_from_rom:
 ;    SRAM_WRITE 0x000F, 0x01
 ;    SRAM_WRITE 0x0010, 0x00
     
+    call write_rom_to_sram
     
     call release_control
     call z80_reset
-    call become_iomode
+    call set_slave_mode
     
     ;movlw 0x55
     ;movwf LATD
@@ -638,7 +648,7 @@ wait_busack:
     
     return
     
-become_iomode:
+set_slave_mode:
     ; enable ioreq interrupts, falling edge
 ;    bcf INTCON2, INTEDG0
 ;    bcf INTCON, INT0IF
@@ -668,6 +678,41 @@ become_iomode:
     
     return
 ;-------------------------------------------------------
+write_rom_to_sram:
+    movlw upper rom_data
+    movwf TBLPTRU
+    movlw high rom_data
+    movwf TBLPTRH
+    movlw low rom_data
+    movwf TBLPTRL
+    
+    ;flash memory read
+    movlw 0x80
+    movwf EECON1
+    
+    clrf addressbus_val
+    clrf addressbus_val+1
+    
+_wr_sram_from_rom:
+    TBLRD*+
+    nop
+    nop
+    ;nop
+    movf TABLAT, w
+    call sram_write ;call to write sram, even
+    incfsz addressbus_val, f
+    bra _wr_sram_from_rom
+    
+    incf addressbus_val+1, f
+    
+    movf addressbus_val+1, w
+    xorlw 0x04
+    bnz _wr_sram_from_rom
+    return
+;--------------------------------------------------------------------------
+write_to_rom:
+    
+    return
     END
 
 
