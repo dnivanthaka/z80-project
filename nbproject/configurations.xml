@@ -86,6 +86,9 @@
       <PICkit2PlatformTool>
         <property key="pk2settings.setvddvoltage" value="5.00"/>
       </PICkit2PlatformTool>
+      <PICkit3PlatformTool>
+        <property key="firmware.download.all" value="false"/>
+      </PICkit3PlatformTool>
       <mpasmsuite>
         <property key="absolute-mode" value="false"/>
         <property key="eeprom-width" value="8"/>
