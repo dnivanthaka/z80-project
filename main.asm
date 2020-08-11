@@ -319,14 +319,21 @@ psp_handle:
 		btfss TRISE, IBF
 		bra psp_read
 		
+;		btfsc TRISE, OBF
+;		bra psp_exit
+		
 		;if the previous written byts is still present, skip reading
-		;btfss TRISE, OBF
+		;btfsc TRISE, OBF
 		;bra psp_read
 		
 		;psp_write, we got data, needs reading
 		;check if the slave busy flag is set, if it is we ignore it
 		btfsc slaveflags, SLAVEBUSY
 		bra psp_exit
+		
+		;if the write flag is set, we are writing more data
+		btfsc slaveflags, SLAVETX
+		bra psp_read
 		
 		;movlw 0x55
 		movlw rx_buffer
@@ -342,69 +349,58 @@ psp_handle:
 		movwf INDF0
 		incf FSR0L, f
 		
+;		call usart_hex2ascii
+;		call usart_newline
+		
 		incf rx_count, f
 		
 		;clear the IBOV flag
 		bcf TRISE, IBOV
 		
 		;if the recv count is 2, we have a command and data byte
+		bcf slaveflags, SLAVEBUSY
 		movf rx_count, w
 		xorlw 0x02
 		btfsc STATUS, Z
 		bsf slaveflags, SLAVEBUSY
 		bsf slaveflags, SLAVERX
 		
-		;btfss ADDRESS_PORT, ADDRESS_PIN
-		;bra register_action
-		;bra data_action
-    
-;		movlw 0x55
-;		movwf LATD
-;		call addressbus_read
-;		movff PORTD, temp
-;		;xorlw 0x55
-;		;bnz psp_exit
-;		bsf LATB, 3
-;		;movff LATD, WREG
-;		;andlw 0x0f
-;		;movlw 'P'
-;		movlw 'L'
-;		;call usart_putchar
-;		
-;		movf temp, w
-;		call usart_hex2ascii
-;		;call usart_newline
-;		
-;		;call databus_read
-;		movf addressbus_val, w
-;		call usart_hex2ascii
-;		call usart_newline
 		bra psp_exit
 psp_read:	
 		;check if previously written byte is still present, if it is we just skip
 		
-		;btfsc TRISE, OBF
-		;bra psp_exit
+;		btfsc TRISE, OBF
+;		bra psp_exit
 		
 		btfsc TRISE, IBF
 		bra psp_exit
+		
+		;if the read flag is set, we are waiting for more data
+;		btfsc slaveflags, SLAVERX
+;		bra psp_exit
 		
 		;check if we have data to transmit
 		movf tx_count, w
 		xorlw 0x00
 		bz psp_exit
 		;we have data to transmit
-		;movlw tx_buffer
-		;movwf FSR0L
+		movlw tx_buffer
+		movwf FSR0L
 		
 		decf tx_count, f
 		movf tx_count, w
-		;movwf INDF0
+		addwf FSR0L
+		
+		movff INDF0, LATD
 		
 		;movff FSR0L, LATD
 		;movlw 0x99
 		;movwf LATD
-		
+		bcf slaveflags, SLAVEBUSY
+		movf tx_count, w
+		xorlw 0x00
+		btfss STATUS, Z
+		bsf slaveflags, SLAVEBUSY
 		bsf slaveflags, SLAVETX
 		
 		bra psp_exit
@@ -476,7 +472,13 @@ main_loop:
     
     ;check for slave busy flag
     btfsc slaveflags, SLAVEBUSY
-    call handle_slave_command
+    call handle_slave_read
+    
+;    btfsc slaveflags, SLAVERX
+;    bra 
+    
+    ;btfsc slaveflags, SLAVETX
+    ;call handle_slave_write
     
     ;read rx and tx flags
     
@@ -549,26 +551,49 @@ mcu_init:
     
     return
 ;----------------------------------------------------------------    
-handle_slave_command:
+handle_slave_read:
     bsf LATA, 0
     
     bcf slaveflags, SLAVEBUSY
     bcf slaveflags, SLAVERX
     clrf rx_count
     
-    movlw 0x11
-    movwf tx_buffer
-    movlw 0x55
-    movwf tx_buffer+1
-    
-    movlw .2
-    movwf tx_count
+;    movlw 0x11
+;    movwf tx_buffer
+;    movlw 0x55
+;    movwf tx_buffer+1
+;    
+;    movlw .2
+;    movwf tx_count
     
     movf rx_buffer, w
     call usart_hex2ascii
     movf rx_buffer+1, w
     call usart_hex2ascii
     call usart_newline
+    
+    clrf rx_buffer
+    clrf rx_buffer+1
+    clrf rx_buffer+2
+    clrf rx_buffer+3
+    
+    ;--------------- Testing ------------
+    clrf tx_count
+    clrf tx_buffer
+    clrf tx_buffer+1
+    clrf tx_buffer+2
+    clrf tx_buffer+3
+    
+    bcf slaveflags, SLAVETX
+    
+    return
+;----------------------------------------------------------------
+handle_slave_write:
+    ;bcf slaveflags, SLAVEBUSY
+    bcf slaveflags, SLAVETX
+    clrf tx_count
+    
+    
     
     return
 ;----------------------------------------------------------------    
