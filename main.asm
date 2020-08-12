@@ -331,11 +331,16 @@ psp_handle:
 		btfsc slaveflags, SLAVEBUSY
 		bra psp_exit
 		
+		; we ignore data bytes if we dont need it
+		btfss slaveflags, SLAVERX
+		bra psp_exit
+		
 		;if the write flag is set, we are writing more data
 		btfsc slaveflags, SLAVETX
 		bra psp_read
 		
 		;movlw 0x55
+		clrf FSR0H
 		movlw rx_buffer
 		movwf FSR0L
 		
@@ -345,12 +350,12 @@ psp_handle:
 		addwf FSR0L
 		
 		movf PORTD, w
-		;movlw 0x55
+		;movlw 0x57
 		movwf INDF0
-		incf FSR0L, f
-		
-;		call usart_hex2ascii
-;		call usart_newline
+		;incf FSR0L, f
+;		
+		;call usart_hex2ascii
+		;call usart_newline
 		
 		incf rx_count, f
 		
@@ -375,9 +380,15 @@ psp_read:
 		btfsc TRISE, IBF
 		bra psp_exit
 		
+		btfsc slaveflags, SLAVEBUSY
+		bra psp_exit
+		
+		btfss slaveflags, SLAVETX
+		bra psp_exit
+		
 		;if the read flag is set, we are waiting for more data
-;		btfsc slaveflags, SLAVERX
-;		bra psp_exit
+		btfsc slaveflags, SLAVERX
+		bra psp_exit
 		
 		;check if we have data to transmit
 		movf tx_count, w
@@ -396,17 +407,19 @@ psp_read:
 		;movff FSR0L, LATD
 		;movlw 0x99
 		;movwf LATD
-		bcf slaveflags, SLAVEBUSY
-		movf tx_count, w
-		xorlw 0x00
-		btfss STATUS, Z
-		bsf slaveflags, SLAVEBUSY
-		bsf slaveflags, SLAVETX
+		;bcf slaveflags, SLAVEBUSY
+		;movf tx_count, w
+		;xorlw 0x00
+		;btfss STATUS, Z
+		;bsf slaveflags, SLAVEBUSY
+		;bsf slaveflags, SLAVETX
 		
 		bra psp_exit
 			
 		
 psp_exit:    
+		; Clear IBOV flag
+		bcf TRISE, IBOV
 		bcf PIR1, PSPIF
 ;		bsf Z80_WAIT_LAT, Z80_WAIT_PIN
 ;		nop
@@ -468,11 +481,27 @@ Main:
     call z80_reset
     call set_slave_mode
     
+    ;enable receive
+    bsf slaveflags, SLAVERX
+    
 main_loop:
     
     ;check for slave busy flag
+;    movlw SLAVERX | SLAVEBUSY
+;    xorwf slaveflags, w
+;    btfsc STATUS, Z
+;    call handle_slave_read
+;    
+;    movlw SLAVETX
+;    xorwf slaveflags, w
+;    btfsc STATUS, Z
+;    call handle_slave_write
+;    btfsc slaveflags, SLAVERX
     btfsc slaveflags, SLAVEBUSY
     call handle_slave_read
+    
+    btfsc slaveflags, SLAVETX
+    call handle_slave_write
     
 ;    btfsc slaveflags, SLAVERX
 ;    bra 
@@ -555,36 +584,56 @@ handle_slave_read:
     bsf LATA, 0
     
     bcf slaveflags, SLAVEBUSY
-    bcf slaveflags, SLAVERX
+    bsf slaveflags, SLAVERX
     clrf rx_count
-    
+    _DI_
 ;    movlw 0x11
-;    movwf tx_buffer
+;    movwf rx_buffer
 ;    movlw 0x55
-;    movwf tx_buffer+1
+;    movwf rx_buffer+1
 ;    
 ;    movlw .2
 ;    movwf tx_count
+   ; clrf FSR0H
+    ;movlw rx_buffer
+    ;movwf FSR0L
+;    
+    ;movlw 0x00
+    ;addwf FSR0
+    
+    ;incf FSR0, f
+    
+    ;movlw 0x79
+    ;movwf INDF0
+    
+    ;incf FSR0L, f
+;    
+    ;movlw 0x89
+    ;movwf INDF0
     
     movf rx_buffer, w
     call usart_hex2ascii
     movf rx_buffer+1, w
     call usart_hex2ascii
     call usart_newline
+    _EI_
     
     clrf rx_buffer
     clrf rx_buffer+1
     clrf rx_buffer+2
     clrf rx_buffer+3
     
-    ;--------------- Testing ------------
-    clrf tx_count
-    clrf tx_buffer
-    clrf tx_buffer+1
-    clrf tx_buffer+2
-    clrf tx_buffer+3
+; Testing reply
+    movlw .2
+    movwf tx_count
+
+    movlw 0x23
+    movwf tx_buffer
     
-    bcf slaveflags, SLAVETX
+    movlw 0x34
+    movwf tx_buffer+1
+    
+    bsf slaveflags, SLAVETX
     
     return
 ;----------------------------------------------------------------
@@ -593,7 +642,14 @@ handle_slave_write:
     bcf slaveflags, SLAVETX
     clrf tx_count
     
+    clrf tx_buffer
+    clrf tx_buffer+1
+    clrf tx_buffer+2
+    clrf tx_buffer+3
     
+    bcf slaveflags, SLAVETX
+    
+    bsf slaveflags, SLAVERX
     
     return
 ;----------------------------------------------------------------    
