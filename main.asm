@@ -270,7 +270,10 @@ SRAM_READ MACRO ADDR
 
 		ORG	0x0008
 		
-		;bcf Z80_WAIT_LAT, Z80_WAIT_PIN
+;		bcf Z80_WAIT_LAT, Z80_WAIT_PIN
+;		bcf Z80_WAIT_TRIS, Z80_WAIT_PIN
+		bcf ADDRESS_LAT, ADDRESS_PIN
+		bcf ADDRESS_TRIS, ADDRESS_PIN
 		
 		bra	HighInt		;go to high priority interrupt routine
 
@@ -314,6 +317,11 @@ HighInt:
 		bra int_exit
 		
 psp_handle:
+    
+;    		movf TRISE, w
+;		call usart_hex2ascii
+;		call usart_newline
+		
 		bsf LATB, 3
 		;check if its a read or write
 		btfss TRISE, IBF
@@ -329,6 +337,9 @@ psp_handle:
 		;psp_write, we got data, needs reading
 		;check if the slave busy flag is set, if it is we ignore it
 		btfsc slaveflags, SLAVEBUSY
+;		movlw SLAVERX | SLAVEBUSY
+;		xorwf slaveflags, w
+;		btfsc STATUS, Z
 		bra psp_exit
 		
 		; we ignore data bytes if we dont need it
@@ -336,8 +347,8 @@ psp_handle:
 		bra psp_exit
 		
 		;if the write flag is set, we are writing more data
-		btfsc slaveflags, SLAVETX
-		bra psp_read
+		;btfsc slaveflags, SLAVETX
+		;bra psp_read
 		
 		;movlw 0x55
 		clrf FSR0H
@@ -363,12 +374,12 @@ psp_handle:
 		bcf TRISE, IBOV
 		
 		;if the recv count is 2, we have a command and data byte
-		bcf slaveflags, SLAVEBUSY
+		;bcf slaveflags, SLAVEBUSY
 		movf rx_count, w
 		xorlw 0x02
 		btfsc STATUS, Z
 		bsf slaveflags, SLAVEBUSY
-		bsf slaveflags, SLAVERX
+		;bsf slaveflags, SLAVERX
 		
 		bra psp_exit
 psp_read:	
@@ -381,19 +392,26 @@ psp_read:
 		bra psp_exit
 		
 		btfsc slaveflags, SLAVEBUSY
+;		movlw SLAVETX | SLAVEBUSY
+;		xorwf slaveflags, w
+;		btfss STATUS, Z
 		bra psp_exit
 		
 		btfss slaveflags, SLAVETX
 		bra psp_exit
 		
+;		movlw 0x99
+;		call usart_hex2ascii
+;		call usart_newline
+		
 		;if the read flag is set, we are waiting for more data
-		btfsc slaveflags, SLAVERX
-		bra psp_exit
+		;btfsc slaveflags, SLAVERX
+		;bra psp_exit
 		
 		;check if we have data to transmit
 		movf tx_count, w
 		xorlw 0x00
-		bz psp_exit
+		bz _psp_read_exit
 		;we have data to transmit
 		movlw tx_buffer
 		movwf FSR0L
@@ -404,6 +422,9 @@ psp_read:
 		
 		movff INDF0, LATD
 		
+		bra psp_exit
+
+_psp_read_exit:
 		;movff FSR0L, LATD
 		;movlw 0x99
 		;movwf LATD
@@ -413,6 +434,10 @@ psp_read:
 		;btfss STATUS, Z
 		;bsf slaveflags, SLAVEBUSY
 		;bsf slaveflags, SLAVETX
+		
+		;bcf slaveflags, SLAVEBUSY
+		bcf slaveflags, SLAVETX
+		bsf slaveflags, SLAVERX
 		
 		bra psp_exit
 			
@@ -431,7 +456,10 @@ int_exit:
 		movff	WREG_TEMP,WREG		;restore working register
 		movff	STATUS_TEMP,STATUS	;restore STATUS register
 		
-		;bsf Z80_WAIT_LAT, Z80_WAIT_PIN
+		;btfsc slaveflags, SLAVEBUSY
+		;bsf Z80_WAIT_TRIS, Z80_WAIT_PIN
+		btfss slaveflags, SLAVEBUSY
+		bsf ADDRESS_TRIS, ADDRESS_PIN
 		
 		retfie	FAST
 
@@ -492,16 +520,16 @@ main_loop:
 ;    btfsc STATUS, Z
 ;    call handle_slave_read
 ;    
-;    movlw SLAVETX
-;    xorwf slaveflags, w
-;    btfsc STATUS, Z
-;    call handle_slave_write
+    ;movlw SLAVETX | SLAVEBUSY
+    ;xorwf slaveflags, w
+    ;btfsc STATUS, Z
+    ;call handle_slave_write
 ;    btfsc slaveflags, SLAVERX
     btfsc slaveflags, SLAVEBUSY
     call handle_slave_read
     
-    btfsc slaveflags, SLAVETX
-    call handle_slave_write
+;    btfsc slaveflags, SLAVETX
+;    call handle_slave_write
     
 ;    btfsc slaveflags, SLAVERX
 ;    bra 
@@ -570,7 +598,7 @@ mcu_init:
     clrf CCP1CON
     clrf CCP2CON                ; disable comparator
     
-    bsf BUS_LATCH_LAT, BUS_LATCH_PIN ; A -> B
+    bcf BUS_LATCH_LAT, BUS_LATCH_PIN ; A -> B, OE
     bcf BUS_LATCH_TRIS, BUS_LATCH_PIN
     
     ;Enabling TMR0
@@ -583,10 +611,11 @@ mcu_init:
 handle_slave_read:
     bsf LATA, 0
     
-    bcf slaveflags, SLAVEBUSY
-    bsf slaveflags, SLAVERX
-    clrf rx_count
     _DI_
+    bcf slaveflags, SLAVEBUSY
+    bcf slaveflags, SLAVERX
+    clrf rx_count
+    
 ;    movlw 0x11
 ;    movwf rx_buffer
 ;    movlw 0x55
@@ -612,11 +641,14 @@ handle_slave_read:
     ;movwf INDF0
     
     movf rx_buffer, w
-    call usart_hex2ascii
+;    call usart_hex2ascii
+    call usart_putchar
     movf rx_buffer+1, w
-    call usart_hex2ascii
+;    call usart_hex2ascii
+;    call usart_newline
+    call usart_putchar
     call usart_newline
-    _EI_
+    
     
     clrf rx_buffer
     clrf rx_buffer+1
@@ -624,21 +656,27 @@ handle_slave_read:
     clrf rx_buffer+3
     
 ; Testing reply
-    movlw .2
+    movlw .0
     movwf tx_count
 
     movlw 0x23
     movwf tx_buffer
+    movwf LATD
     
-    movlw 0x34
-    movwf tx_buffer+1
+;    movlw 0x34
+;    movwf tx_buffer+1
     
     bsf slaveflags, SLAVETX
+    
+    _EI_
+    
+    ;bsf Z80_WAIT_TRIS, Z80_WAIT_PIN
+    bsf ADDRESS_TRIS, ADDRESS_PIN
     
     return
 ;----------------------------------------------------------------
 handle_slave_write:
-    ;bcf slaveflags, SLAVEBUSY
+    ;bsf slaveflags, SLAVEBUSY
     bcf slaveflags, SLAVETX
     clrf tx_count
     
@@ -647,7 +685,7 @@ handle_slave_write:
     clrf tx_buffer+2
     clrf tx_buffer+3
     
-    bcf slaveflags, SLAVETX
+    ;bcf slaveflags, SLAVETX
     
     bsf slaveflags, SLAVERX
     
@@ -819,8 +857,9 @@ set_slave_mode:
     bsf INTCON, 6 ; PEIE
     bsf INTCON, 7 ; GIE
     
-    bcf BUS_LATCH_LAT, BUS_LATCH_PIN ; B -> A
-    bsf Z80_WAIT_LAT, Z80_WAIT_PIN
+    bsf BUS_LATCH_LAT, BUS_LATCH_PIN ; Output disable
+    
+    bsf Z80_WAIT_TRIS, Z80_WAIT_PIN
     
     clrf tx_count
     clrf rx_count
