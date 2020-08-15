@@ -15,7 +15,9 @@
 
 	LIST P=18F452		;directive to define processor
 	#include <p18f452.inc>	;processor specific variable definitions
+	#include "config.inc"
 	#include "mcp23s17.inc"
+	
 	
 
 ;******************************************************************************
@@ -26,51 +28,7 @@
 
 
 ; CONFIG1L
-CONFIG OSC = HSPLL         ; Oscillator Selection bits (HS oscillator)
-CONFIG OSCS = OFF       ; Oscillator System Clock Switch Enable bit (Oscillator system clock switch option is disabled (main oscillator is source))
 
-; CONFIG2L
-CONFIG PWRT = OFF       ; Power-up Timer Enable bit (PWRT disabled)
-CONFIG BOR = ON         ; Brown-out Reset Enable bit (Brown-out Reset enabled)
-CONFIG BORV = 20        ; Brown-out Reset Voltage bits (VBOR set to 2.0V)
-
-; CONFIG2H
-CONFIG WDT = OFF        ; Watchdog Timer Enable bit (WDT disabled (control is placed on the SWDTEN bit))
-CONFIG WDTPS = 128      ; Watchdog Timer Postscale Select bits (1:128)
-
-; CONFIG3H
-CONFIG CCP2MUX = ON     ; CCP2 Mux bit (CCP2 input/output is multiplexed with RC1)
-
-; CONFIG4L
-CONFIG STVR = ON        ; Stack Full/Underflow Reset Enable bit (Stack Full/Underflow will cause RESET)
-CONFIG LVP = OFF        ; Low Voltage ICSP Enable bit (Low Voltage ICSP disabled)
-
-; CONFIG5L
-CONFIG CP0 = OFF        ; Code Protection bit (Block 0 (000200-001FFFh) not code protected)
-CONFIG CP1 = OFF        ; Code Protection bit (Block 1 (002000-003FFFh) not code protected)
-CONFIG CP2 = OFF        ; Code Protection bit (Block 2 (004000-005FFFh) not code protected)
-CONFIG CP3 = OFF        ; Code Protection bit (Block 3 (006000-007FFFh) not code protected)
-
-; CONFIG5H
-CONFIG CPB = OFF        ; Boot Block Code Protection bit (Boot Block (000000-0001FFh) not code protected)
-CONFIG CPD = OFF        ; Data EEPROM Code Protection bit (Data EEPROM not code protected)
-
-; CONFIG6L
-CONFIG WRT0 = OFF       ; Write Protection bit (Block 0 (000200-001FFFh) not write protected)
-CONFIG WRT1 = OFF       ; Write Protection bit (Block 1 (002000-003FFFh) not write protected)
-CONFIG WRT2 = OFF       ; Write Protection bit (Block 2 (004000-005FFFh) not write protected)
-CONFIG WRT3 = OFF       ; Write Protection bit (Block 3 (006000-007FFFh) not write protected)
-
-; CONFIG6H
-CONFIG WRTC = OFF       ; Configuration Register Write Protection bit (Configuration registers (300000-3000FFh) not write protected)
-CONFIG WRTB = OFF       ; Boot Block Write Protection bit (Boot Block (000000-0001FFh) not write protected)
-CONFIG WRTD = OFF       ; Data EEPROM Write Protection bit (Data EEPROM not write protected)
-
-; CONFIG7L
-CONFIG EBTR0 = OFF      ; Table Read Protection bit (Block 0 (000200-001FFFh) not protected from Table Reads executed in other blocks)
-CONFIG EBTR1 = OFF      ; Table Read Protection bit (Block 1 (002000-003FFFh) not protected from Table Reads executed in other blocks)
-CONFIG EBTR2 = OFF      ; Table Read Protection bit (Block 2 (004000-005FFFh) not protected from Table Reads executed in other blocks)
-CONFIG EBTR3 = OFF      ; Table Read Protection bit (Block 3 (006000-007FFFh) not protected from Table Reads executed in other blocks)
 	
 ;CONFIG = _BOR_OFF_2L & _CPD_OFF_5H & _FOSC_HSPLL_HS_1H & _WDT_OFF_2H & _CP0_OFF_5L & _CP1_OFF_5L & _CP2_OFF_5L & _CP3_OFF_5L & _LVP_OFF_4L & _FCMEN_OFF_1H
 ;CONFIG = PLLDIV_10_1L ; For 40Mhz input = 40 / 10 = 4
@@ -132,10 +90,11 @@ CONFIG EBTR3 = OFF      ; Table Read Protection bit (Block 3 (006000-007FFFh) no
 #define SLAVERX   0
 #define SLAVETX   1
 #define SLAVEBUSY 2 
+
+#define ACK_BYTE 0x12
  
  
- 
- SRAM_CS1_HI MACRO
+SRAM_CS1_HI MACRO
 	    bsf     SRAM_CS1_LAT, SRAM_CS1_PIN
 	    ENDM 
  
@@ -181,6 +140,7 @@ EXTERN addressbus_init
 EXTERN addressbusmode_set
 EXTERN addressbus_read
 EXTERN addressbus_write
+EXTERN addressbusmodeio_set	    
 	    
 EXTERN usart_init
 EXTERN usart_putchar
@@ -272,8 +232,12 @@ SRAM_READ MACRO ADDR
 		
 ;		bcf Z80_WAIT_LAT, Z80_WAIT_PIN
 ;		bcf Z80_WAIT_TRIS, Z80_WAIT_PIN
-		bcf ADDRESS_LAT, ADDRESS_PIN
-		bcf ADDRESS_TRIS, ADDRESS_PIN
+;		bcf ADDRESS_LAT, ADDRESS_PIN
+;		bcf ADDRESS_TRIS, ADDRESS_PIN
+		;movlw 0x00
+		clrf addressbus_val
+		call addressbus_write
+		
 		
 		bra	HighInt		;go to high priority interrupt routine
 
@@ -317,56 +281,31 @@ HighInt:
 		bra int_exit
 		
 psp_handle:
-    
-;    		movf TRISE, w
-;		call usart_hex2ascii
-;		call usart_newline
 		
 		bsf LATB, 3
 		;check if its a read or write
 		btfss TRISE, IBF
 		bra psp_read
 		
-;		btfsc TRISE, OBF
-;		bra psp_exit
-		
-		;if the previous written byts is still present, skip reading
-		;btfsc TRISE, OBF
-		;bra psp_read
-		
 		;psp_write, we got data, needs reading
 		;check if the slave busy flag is set, if it is we ignore it
 		btfsc slaveflags, SLAVEBUSY
-;		movlw SLAVERX | SLAVEBUSY
-;		xorwf slaveflags, w
-;		btfsc STATUS, Z
 		bra psp_exit
 		
 		; we ignore data bytes if we dont need it
 		btfss slaveflags, SLAVERX
 		bra psp_exit
 		
-		;if the write flag is set, we are writing more data
-		;btfsc slaveflags, SLAVETX
-		;bra psp_read
-		
-		;movlw 0x55
 		clrf FSR0H
 		movlw rx_buffer
 		movwf FSR0L
 		
 		;start count
-		;movff rx_count, FSR0L
 		movf rx_count, w
 		addwf FSR0L
 		
 		movf PORTD, w
-		;movlw 0x57
 		movwf INDF0
-		;incf FSR0L, f
-;		
-		;call usart_hex2ascii
-		;call usart_newline
 		
 		incf rx_count, f
 		
@@ -392,17 +331,10 @@ psp_read:
 		bra psp_exit
 		
 		btfsc slaveflags, SLAVEBUSY
-;		movlw SLAVETX | SLAVEBUSY
-;		xorwf slaveflags, w
-;		btfss STATUS, Z
 		bra psp_exit
 		
 		btfss slaveflags, SLAVETX
 		bra psp_exit
-		
-;		movlw 0x99
-;		call usart_hex2ascii
-;		call usart_newline
 		
 		;if the read flag is set, we are waiting for more data
 		;btfsc slaveflags, SLAVERX
@@ -425,17 +357,6 @@ psp_read:
 		bra psp_exit
 
 _psp_read_exit:
-		;movff FSR0L, LATD
-		;movlw 0x99
-		;movwf LATD
-		;bcf slaveflags, SLAVEBUSY
-		;movf tx_count, w
-		;xorlw 0x00
-		;btfss STATUS, Z
-		;bsf slaveflags, SLAVEBUSY
-		;bsf slaveflags, SLAVETX
-		
-		;bcf slaveflags, SLAVEBUSY
 		bcf slaveflags, SLAVETX
 		bsf slaveflags, SLAVERX
 		
@@ -446,10 +367,6 @@ psp_exit:
 		; Clear IBOV flag
 		bcf TRISE, IBOV
 		bcf PIR1, PSPIF
-;		bsf Z80_WAIT_LAT, Z80_WAIT_PIN
-;		nop
-		;reset line low
-;		bcf Z80_WAIT_LAT, Z80_WAIT_PIN
 int_exit:
     
 		movff	BSR_TEMP,BSR		;restore BSR register
@@ -458,8 +375,12 @@ int_exit:
 		
 		;btfsc slaveflags, SLAVEBUSY
 		;bsf Z80_WAIT_TRIS, Z80_WAIT_PIN
+		movlw 0x00
 		btfss slaveflags, SLAVEBUSY
-		bsf ADDRESS_TRIS, ADDRESS_PIN
+		;bsf ADDRESS_TRIS, ADDRESS_PIN
+		movlw 0x80
+		movwf addressbus_val
+		call addressbus_write
 		
 		retfie	FAST
 
@@ -612,66 +533,70 @@ handle_slave_read:
     bsf LATA, 0
     
     _DI_
+    
     bcf slaveflags, SLAVEBUSY
     bcf slaveflags, SLAVERX
     clrf rx_count
     
-;    movlw 0x11
-;    movwf rx_buffer
-;    movlw 0x55
-;    movwf rx_buffer+1
-;    
-;    movlw .2
-;    movwf tx_count
-   ; clrf FSR0H
-    ;movlw rx_buffer
-    ;movwf FSR0L
-;    
-    ;movlw 0x00
-    ;addwf FSR0
-    
-    ;incf FSR0, f
-    
-    ;movlw 0x79
-    ;movwf INDF0
-    
-    ;incf FSR0L, f
-;    
-    ;movlw 0x89
-    ;movwf INDF0
+    movf rx_buffer, w
+    call usart_hex2ascii
     
     movf rx_buffer, w
-;    call usart_hex2ascii
-    call usart_putchar
+    xorlw 0x02
+    bz _set_tmr0
+    
+    movf rx_buffer, w
+    xorlw 0x03
+    bz _send_tmr0
+    
     movf rx_buffer+1, w
-;    call usart_hex2ascii
-;    call usart_newline
     call usart_putchar
     call usart_newline
-    
     
     clrf rx_buffer
     clrf rx_buffer+1
     clrf rx_buffer+2
     clrf rx_buffer+3
     
-; Testing reply
     movlw .0
     movwf tx_count
-
-    movlw 0x23
-    movwf tx_buffer
-    movwf LATD
     
-;    movlw 0x34
-;    movwf tx_buffer+1
+    bra _send_done
+    
+_send_tmr0:
+    movlw .1
+    movwf tx_count
+    
+    movf TMR0, w
+    movwf tx_buffer
+    
+    bra _send_done
+    
+_set_tmr0:
+    movlw .0
+    movwf tx_count
+    
+    movf rx_buffer+1, w
+    movwf TMR0
+    
+    ;bra _send_done
+    
+; reply
+_send_done:    
+
+    movlw ACK_BYTE
+    movwf LATD
     
     bsf slaveflags, SLAVETX
     
     _EI_
     
     ;bsf Z80_WAIT_TRIS, Z80_WAIT_PIN
-    bsf ADDRESS_TRIS, ADDRESS_PIN
+    ;bsf ADDRESS_TRIS, ADDRESS_PIN
+    
+    movlw 0x80
+    movwf addressbus_val
+    call addressbus_write
     
     return
 ;----------------------------------------------------------------
@@ -725,17 +650,6 @@ sram_read:
 ;----------------------------------------------------------------    
 sram_write:
     movwf sram_temp
-    
-;    movf addressbus_val, w
-;    call usart_hex2ascii
-;    movf addressbus_val+1, w
-;    call usart_hex2ascii
-;    movf sram_temp, w
-;    call usart_hex2ascii
-;    movlw ' '
-;    call usart_putchar
-    ;call usart_newline
-    ;call usart_newline
     
     movlw 0x00
     call addressbusmode_set
@@ -831,7 +745,23 @@ wait_busack:
     nop
     
     return
+;-------------------------------------------------------------------    
+z80_hold_in_reset:
+    bcf Z80_RESET_LAT, Z80_RESET_PIN
+    bcf Z80_RESET_TRIS, Z80_RESET_PIN
     
+    return
+;-------------------------------------------------------------------
+z80_release_from_reset:
+    bsf Z80_RESET_LAT, Z80_RESET_PIN
+    
+wait_busack2:
+    btfss Z80_BUSACK_PORT, Z80_BUSACK_PIN
+    bra  wait_busack2    
+    
+    nop
+    return
+;------------------------------------------------------------------- 
 set_slave_mode:
     ; enable ioreq interrupts, falling edge
 ;    bcf INTCON2, INTEDG0
@@ -860,6 +790,10 @@ set_slave_mode:
     bsf BUS_LATCH_LAT, BUS_LATCH_PIN ; Output disable
     
     bsf Z80_WAIT_TRIS, Z80_WAIT_PIN
+    
+    ; set lower 8bit addressbus as output
+    movlw 0x00
+    call addressbusmodeio_set
     
     clrf tx_count
     clrf rx_count

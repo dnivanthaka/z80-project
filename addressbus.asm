@@ -103,12 +103,54 @@ addressbus_write:
     call mcp23s17_write
     
     return
+;---------------------------------------------------------------
+addressbusmodeio_set:
+    bcf STATUS, Z
+    xorlw 0x01
+    btfss STATUS, Z
+    bra _ab_mode_output
+    
+_ab_modeio_input:
+    movlw IODIRA
+    movwf MCP23X17_REG
+    
+    movlw 0xff
+    movwf MCP23X17_DATA
+    
+    call mcp23s17_write
+    
+    movlw IODIRB_0
+    movwf MCP23X17_REG
+    
+    movlw 0xff
+    movwf MCP23X17_DATA
+    
+    call mcp23s17_write
+    return
+_ab_modeio_output:    
+    movlw IODIRA
+    movwf MCP23X17_REG
+    
+    movlw 0x00
+    movwf MCP23X17_DATA
+    
+    call mcp23s17_write
+    
+    movlw IODIRB_0
+    movwf MCP23X17_REG
+    
+    movlw 0xff
+    movwf MCP23X17_DATA
+    
+    call mcp23s17_write
+    return
 ;---------------------------------------------------------------    
 GLOBAL addressbus_val
 GLOBAL addressbus_init
 GLOBAL addressbusmode_set
 GLOBAL addressbus_read
-GLOBAL addressbus_write    
+GLOBAL addressbus_write
+GLOBAL addressbusmodeio_set    
     
 	END
 
