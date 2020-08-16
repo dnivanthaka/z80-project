@@ -25,6 +25,7 @@ usart_init:
     movwf TXSTA
     
     bcf TXSTA, SYNC
+    bsf RCSTA, CREN
     bsf RCSTA, SPEN
     
     

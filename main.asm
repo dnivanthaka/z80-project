@@ -232,11 +232,11 @@ SRAM_READ MACRO ADDR
 		
 ;		bcf Z80_WAIT_LAT, Z80_WAIT_PIN
 ;		bcf Z80_WAIT_TRIS, Z80_WAIT_PIN
-;		bcf ADDRESS_LAT, ADDRESS_PIN
-;		bcf ADDRESS_TRIS, ADDRESS_PIN
+		bcf ADDRESS_LAT, ADDRESS_PIN
+		bcf ADDRESS_TRIS, ADDRESS_PIN
 		;movlw 0x00
-		clrf addressbus_val
-		call addressbus_write
+;		clrf addressbus_val
+;		call addressbus_write
 		
 		
 		bra	HighInt		;go to high priority interrupt routine
@@ -344,7 +344,9 @@ psp_read:
 		movf tx_count, w
 		xorlw 0x00
 		bz _psp_read_exit
+		
 		;we have data to transmit
+		clrf FSR0H
 		movlw tx_buffer
 		movwf FSR0L
 		
@@ -375,12 +377,8 @@ int_exit:
 		
 		;btfsc slaveflags, SLAVEBUSY
 		;bsf Z80_WAIT_TRIS, Z80_WAIT_PIN
-		movlw 0x00
 		btfss slaveflags, SLAVEBUSY
-		;bsf ADDRESS_TRIS, ADDRESS_PIN
-		movlw 0x80
-		movwf addressbus_val
-		call addressbus_write
+		bsf ADDRESS_TRIS, ADDRESS_PIN
 		
 		retfie	FAST
 
@@ -448,6 +446,10 @@ main_loop:
 ;    btfsc slaveflags, SLAVERX
     btfsc slaveflags, SLAVEBUSY
     call handle_slave_read
+    
+    
+    ;call usart_getchar
+    ;call usart_hex2ascii
     
 ;    btfsc slaveflags, SLAVETX
 ;    call handle_slave_write
@@ -533,25 +535,25 @@ handle_slave_read:
     bsf LATA, 0
     
     _DI_
-    
     bcf slaveflags, SLAVEBUSY
     bcf slaveflags, SLAVERX
     clrf rx_count
     
     movf rx_buffer, w
-    call usart_hex2ascii
-    
-    movf rx_buffer, w
     xorlw 0x02
-    bz _set_tmr0
+    bz _usart_out
     
     movf rx_buffer, w
     xorlw 0x03
-    bz _send_tmr0
+    bz _usart_in
     
-    movf rx_buffer+1, w
-    call usart_putchar
-    call usart_newline
+    movf rx_buffer, w
+    xorlw 0x04
+    bz _set_tmr0
+    
+    movf rx_buffer, w
+    xorlw 0x05
+    bz _send_tmr0
     
     clrf rx_buffer
     clrf rx_buffer+1
@@ -559,6 +561,25 @@ handle_slave_read:
     clrf rx_buffer+3
     
     movlw .0
+    movwf tx_count
+    
+    bra _send_done
+    
+_usart_out:
+    
+    clrf tx_count
+    
+    movf rx_buffer+1, w
+    call usart_putchar
+    
+    bra _send_done
+    
+_usart_in:
+    
+    call usart_getchar
+    movwf tx_buffer
+    
+    movlw .1
     movwf tx_count
     
     bra _send_done
@@ -592,11 +613,11 @@ _send_done:
     _EI_
     
     ;bsf Z80_WAIT_TRIS, Z80_WAIT_PIN
-    ;bsf ADDRESS_TRIS, ADDRESS_PIN
+    bsf ADDRESS_TRIS, ADDRESS_PIN
     
-    movlw 0x80
-    movwf addressbus_val
-    call addressbus_write
+;    movlw 0x80
+;    movwf addressbus_val
+;    call addressbus_write
     
     return
 ;----------------------------------------------------------------
@@ -791,9 +812,9 @@ set_slave_mode:
     
     bsf Z80_WAIT_TRIS, Z80_WAIT_PIN
     
-    ; set lower 8bit addressbus as output
-    movlw 0x00
-    call addressbusmodeio_set
+;    ; set lower 8bit addressbus as output
+;    movlw 0x00
+;    call addressbusmodeio_set
     
     clrf tx_count
     clrf rx_count
