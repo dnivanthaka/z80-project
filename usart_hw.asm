@@ -30,7 +30,7 @@ usart_init:
     
     
     ;bsf PIE1, TXIE
-    ;bsf PIE1, RCIE
+    bsf PIE1, RCIE
     
     return
 ;--------------------------------------------------------------------    

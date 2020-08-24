@@ -3,7 +3,7 @@
     <type>com.microchip.mplab.nbide.embedded.makeproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
-            <name>ASM452</name>
+            <name>Z80Project</name>
             <creation-uuid>e19eaef7-234a-43e8-b7db-87dc1221587c</creation-uuid>
             <make-project-type>0</make-project-type>
             <c-extensions/>
